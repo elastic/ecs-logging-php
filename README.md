@@ -9,3 +9,6 @@ Currently only [Monolog:2.*](https://github.com/Seldaek/monolog) is supported.
 ## References
 * Introduction to ECS [blog post](https://www.elastic.co/blog/introducing-the-elastic-common-schema).
 * Logs UI [blog post](https://www.elastic.co/blog/infrastructure-and-logs-ui-new-ways-for-ops-to-interact-with-elasticsearch).
+
+## License
+This software is licensed under the [Apache 2 license](https://github.com/elastic/ecs-logging-php/blob/master/LICENSE).
