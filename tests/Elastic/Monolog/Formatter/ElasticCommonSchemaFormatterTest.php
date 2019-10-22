@@ -71,8 +71,37 @@ class ElasticCommonSchemaFormatterTest extends \PHPUnit\Framework\TestCase
      * @depends testFormat
      *
      * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
-    public function testDistributedTracing()
+    public function testDistributedTracingWithOnlyTraceId()
+    {
+        $msg = [
+            'level'      => Logger::NOTICE,
+            'level_name' => 'NOTICE',
+            'channel'    => 'ecs',
+            'datetime'   => new \DateTimeImmutable("@0"),
+            'message'    => md5(uniqid()),
+            'context'    => ['trace' => '4bf92f3577b34da6a3ce929d0e0e'.rand(1000, 9999)],
+            'extra'      => [],
+        ];
+
+        $formatter = new ElasticCommonSchemaFormatter();
+        $doc = $formatter->format($msg);
+
+        $decoded = json_decode($doc, true);
+        $this->assertArrayHasKey('trace', $decoded);
+        $this->assertArrayNotHasKey('transaction', $decoded);
+        $this->assertArrayHasKey('id', $decoded['trace']);
+        $this->assertEquals($msg['context']['trace'], $decoded['trace']['id']);
+    }
+
+    /**
+     * @depends testDistributedTracingWithOnlyTraceId
+     *
+     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     */
+    public function testDistributedTracingWithTraceAndTransactionId()
     {
         $msg = [
             'level'      => Logger::NOTICE,
@@ -95,6 +124,37 @@ class ElasticCommonSchemaFormatterTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($msg['context']['trace'], $decoded['trace']['id']);
         $this->assertEquals($msg['context']['transaction'], $decoded['transaction']['id']);
+    }
+
+    /**
+     * @depends testDistributedTracingWithTraceAndTransactionId
+     *
+     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     */
+    public function testDistributedTracingWithOnlyTransactionId()
+    {
+        $msg = [
+            'level'      => Logger::NOTICE,
+            'level_name' => 'NOTICE',
+            'channel'    => 'ecs',
+            'datetime'   => new \DateTimeImmutable("@0"),
+            'message'    => md5(uniqid()),
+            'context'    => ['transaction' => '00f067aa0ba90'.rand(100, 999)],
+            'extra'      => [],
+        ];
+
+        $formatter = new ElasticCommonSchemaFormatter();
+        $doc = $formatter->format($msg);
+
+        $decoded = json_decode($doc, true);
+
+        // Trace is required, not tracing options set
+        // but transaction is in the context
+        $this->assertArrayNotHasKey('trace', $decoded);
+        $this->assertArrayNotHasKey('transaction', $decoded);
+        $this->assertArrayHasKey('transaction', $decoded['labels']);
+        $this->assertEquals($decoded['labels']['transaction'], $msg['context']['transaction']);
     }
 
     /**

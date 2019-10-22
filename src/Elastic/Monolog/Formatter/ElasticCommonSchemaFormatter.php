@@ -66,14 +66,14 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         }
 
         // Add Tracing Context
-        if (isset($record['context']['trace']) === true && isset($record['context']['transaction']) === true) {
-            $message += [
-                'trace'       => ['id' => trim($record['context']['trace'])],
-                'transaction' => ['id' => trim($record['context']['transaction'])]
-            ];
-
+        if (isset($record['context']['trace']) === true) {
+            $message['trace'] = ['id' => trim($record['context']['trace'])];
             unset($record['context']['trace']);
-            unset($record['context']['transaction']);
+
+            if(isset($record['context']['transaction']) === true) {
+                $message['transaction'] = ['id' => trim($record['context']['transaction'])];
+                unset($record['context']['transaction']);
+            }
         }
 
         // Add Log Message
