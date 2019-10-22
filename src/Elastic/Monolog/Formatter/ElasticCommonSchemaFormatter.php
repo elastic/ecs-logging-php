@@ -70,7 +70,7 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
             $message['trace'] = ['id' => trim($record['context']['trace'])];
             unset($record['context']['trace']);
 
-            if(isset($record['context']['transaction']) === true) {
+            if (isset($record['context']['transaction']) === true) {
                 $message['transaction'] = ['id' => trim($record['context']['transaction'])];
                 unset($record['context']['transaction']);
             }
