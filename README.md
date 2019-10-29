@@ -11,7 +11,7 @@ Please note that the major version of this library is compatible with the major 
 ### Install
 
 ```
-composer require ecs-logging-php
+composer require elastic/ecs-logging-php
 ```
 
 ### Monolog Formater
