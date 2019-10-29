@@ -15,7 +15,7 @@ composer require ecs-logging-php
 ```
 
 ### Monolog Formater
-```
+```php
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter;
