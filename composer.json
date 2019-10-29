@@ -27,7 +27,7 @@
         "psr-4": {"Elastic\\": "src/Elastic"}
     },
     "autoload-dev": {
-        "psr-4": {"Elastic\\": "tests/Elastic"}
+        "psr-4": {"Elastic\\Tests\\": "tests/Elastic"}
     },
     "provide": {
         "psr/log-implementation": "1.0.0"
@@ -40,9 +40,9 @@
     "scripts": {
         "test": [
             "./vendor/bin/parallel-lint . --exclude vendor",
-            "./vendor/bin/phpcs --standard=phpcs.xml --extensions=php --encoding=utf-8 --tab-width=4 -sp src",
-            "./vendor/bin/phpcs --standard=phpcs.xml --extensions=php --encoding=utf-8 --tab-width=4 -sp tests",
-            "./vendor/bin/phpunit --bootstrap tests/bootstrap.php"
+            "./vendor/bin/phpcs --standard=phpcs.xml --extensions=php --encoding=utf-8 --tab-width=4 -sp src/Elastic",
+            "./vendor/bin/phpcs --standard=phpcs.xml --extensions=php --encoding=utf-8 --tab-width=4 -sp tests/Elastic",
+            "./vendor/bin/phpunit -c phpunit.xml.dist --bootstrap tests/bootstrap.php"
         ]
     },
     "config": {

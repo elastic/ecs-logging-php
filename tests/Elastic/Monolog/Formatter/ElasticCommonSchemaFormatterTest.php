@@ -4,8 +4,9 @@
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
-namespace Elastic\Monolog\Formatter;
+namespace Elastic\Tests\Monolog\Formatter;
 
+use \Elastic\Tests\BaseTestCase;
 use Monolog\Logger;
 use Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter;
 
@@ -21,7 +22,7 @@ use Throwable;
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
  */
-class ElasticCommonSchemaFormatterTest extends \PHPUnit\Framework\TestCase
+class ElasticCommonSchemaFormatterTest extends BaseTestCase
 {
 
     /**
@@ -81,7 +82,7 @@ class ElasticCommonSchemaFormatterTest extends \PHPUnit\Framework\TestCase
             'channel'    => 'ecs',
             'datetime'   => new \DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
-            'context'    => ['trace' => '4bf92f3577b34da6a3ce929d0e0e'.rand(1000, 9999)],
+            'context'    => ['trace' => $this->generateTraceId()],
             'extra'      => [],
         ];
 
@@ -109,7 +110,10 @@ class ElasticCommonSchemaFormatterTest extends \PHPUnit\Framework\TestCase
             'channel'    => 'ecs',
             'datetime'   => new \DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
-            'context'    => ['trace' => '4bf92f3577b34da6a3ce929d0e0e'.rand(1000, 9999), 'transaction' => '00f067aa0ba90'.rand(100, 999)],
+            'context'    => [
+                'trace'       => $this->generateTraceId(),
+                'transaction' => $this->generateTransactionId(),
+            ],
             'extra'      => [],
         ];
 
@@ -140,7 +144,7 @@ class ElasticCommonSchemaFormatterTest extends \PHPUnit\Framework\TestCase
             'channel'    => 'ecs',
             'datetime'   => new \DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
-            'context'    => ['transaction' => '00f067aa0ba90'.rand(100, 999)],
+            'context'    => ['transaction' => $this->generateTransactionId()],
             'extra'      => [],
         ];
 
@@ -195,7 +199,51 @@ class ElasticCommonSchemaFormatterTest extends \PHPUnit\Framework\TestCase
      */
     public function testNormalizeException()
     {
-        // TODO
-        $this->assertTrue(true);
+        $t = $this->generateException();
+        $msg = [
+            'level'      => Logger::ERROR,
+            'level_name' => 'ERROR',
+            'channel'    => 'ecs',
+            'datetime'   => new \DateTimeImmutable("@0"),
+            'message'    => md5(uniqid()),
+            'context'    => ['throwable' => $t],
+            'extra'      => [],
+        ];
+
+        $formatter = new ElasticCommonSchemaFormatter();
+
+        $doc = $formatter->format($msg);
+        $decoded = json_decode($doc, true);
+
+        // ECS Struct ?
+        $this->assertArrayHasKey('error', $decoded);
+        $this->assertArrayHasKey('type', $decoded['error']);
+        $this->assertArrayHasKey('message', $decoded['error']);
+        $this->assertArrayHasKey('code', $decoded['error']);
+        $this->assertArrayHasKey('stack_trace', $decoded['error']);
+
+        $this->assertArrayHasKey('log', $decoded);
+        $this->assertArrayHasKey('origin', $decoded['log']);
+        $this->assertArrayHasKey('file', $decoded['log']['origin']);
+        $this->assertArrayHasKey('name', $decoded['log']['origin']['file']);
+        $this->assertArrayHasKey('line', $decoded['log']['origin']['file']);
+
+        // Ensure Array merging is sound ..
+        $this->assertArrayHasKey('level', $decoded['log']);
+        $this->assertArrayHasKey('logger', $decoded['log']);
+
+        // Values Correct ?
+        $this->assertEquals('BaseTestCase.php', basename($decoded['log']['origin']['file']['name']));
+        $this->assertEquals(42, $decoded['log']['origin']['file']['line']);
+
+        $this->assertEquals('InvalidArgumentException', $decoded['error']['type']);
+        $this->assertEquals($t->getMessage(), $decoded['error']['message']);
+        $this->assertEquals($t->getCode(), $decoded['error']['code']);
+        $this->assertIsArray($decoded['error']['stack_trace']);
+        $this->assertNotEmpty($decoded['error']['stack_trace']);
+
+        // Throwable removed from Context/Labels ?
+        $this->assertArrayNotHasKey('labels', $decoded);
     }
+
 }

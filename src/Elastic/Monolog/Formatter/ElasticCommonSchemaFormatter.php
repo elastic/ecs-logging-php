@@ -60,8 +60,12 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         ];
 
         // Add Exception
-        if (isset($record['context']['throwable']) === true && $record['context']['throwable'] instanceof Throwable) {
-            $record = array_merge($record, $this->normalizeException($record['context']['throwable']));
+        if (isset($record['context']['throwable']) === true) {
+            if (isset($record['message']) === false) {
+                $message['message'] = $record['context']['throwable']['error']['message'];
+            }
+            $message['error'] = $record['context']['throwable']['error'];
+            $message['log']   = array_merge($message['log'], $record['context']['throwable']['log']);
             unset($record['context']['throwable']);
         }
 
@@ -97,6 +101,9 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
     /**
      * Normalize Exception and return ECS compliant formart
      *
+     * @param Throwable $e
+     * @param int $depth, Def: 0
+     *
      * @return array
      */
     protected function normalizeException(Throwable $e, int $depth = 0)
@@ -107,7 +114,7 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
                 'type'        => $normalized['class'],
                 'message'     => $normalized['message'],
                 'code'        => $normalized['code'],
-                'stack_trace' => $e->getTraceAsString(),
+                'stack_trace' => explode(PHP_EOL, $e->getTraceAsString()),
             ],
             'log'     => [
                 'origin' => [
