@@ -4,7 +4,7 @@
     "keywords": ["log", "logging", "psr-3", "ecs", "elastic", "filebeat"],
     "homepage": "https://www.elastic.co/guide/en/ecs/",
     "type": "library",
-    "license": "Apache2",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "Philip Krauss",
