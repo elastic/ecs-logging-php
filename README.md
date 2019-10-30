@@ -7,7 +7,7 @@ See [ecs-logging](https://github.com/elastic/ecs-logging) for other ECS logging 
 
 ## Install
 ```
-composer require elastic/ecs-logging-php
+composer require elastic/ecs-logging
 ```
 
 ## Examples and Usage
