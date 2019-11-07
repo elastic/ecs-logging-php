@@ -41,5 +41,4 @@ class BaseTestCase extends TestCase
     {
         return new InvalidArgumentException('This is a InvalidArgumentException', 42);
     }
-
 }

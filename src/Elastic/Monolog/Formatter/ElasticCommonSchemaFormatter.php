@@ -87,7 +87,10 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
 
         // Add ECS Labels
         if (empty($record['context']) === false) {
-            $message['labels'] = $record['context'];
+            $message['labels'] = [];
+            foreach ($record['context'] as $key => $val) {
+                $message['labels'][str_replace(['.', ' '], '_', trim($key))] = $val;
+            }
         }
 
         // Add ECS Tags
