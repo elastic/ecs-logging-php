@@ -32,11 +32,6 @@
     "provide": {
         "psr/log-implementation": "1.0.0"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.x-dev"
-        }
-    },
     "scripts": {
         "test": [
             "./vendor/bin/parallel-lint . --exclude vendor",
