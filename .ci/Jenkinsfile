@@ -51,11 +51,13 @@ pipeline {
           }
         }
         stage('Test-7.3') {
+          agent { label 'linux && immutable' }
           steps {
             buildWithGitHubNotification('7.3-alpine')
           }
         }
         stage('Test-7') {
+          agent { label 'linux && immutable' }
           steps {
             buildWithGitHubNotification('7.4-alpine')
           }
@@ -71,29 +73,25 @@ pipeline {
 }
 
 def build(version){
-   return {
-    deleteDir()
-    unstash 'source'
-    dir("${BASE_DIR}"){
-      try {
-        docker.image("php:${version}").inside("-e PATH=${PATH}:${WORKSPACE}/${BASE_DIR}") {
-          sh(label: 'Install composer', script: '.ci/scripts/install-composer.sh')
-          sh(label: 'Install dependencies', script: 'composer install')
-          sh(label: 'Run tests', script: "vendor/bin/paratest --log-junit=junit-${version}.xml")
-        }
-      } catch(e){
-        error(e.toString())
-      } finally {
-        junit(allowEmptyResults: true, keepLongStdio: true, testResults: "${BASE_DIR}/**/junit-*.xml")
+  deleteDir()
+  unstash 'source'
+  dir("${BASE_DIR}"){
+    try {
+      docker.image("php:${version}").inside("-e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${WORKSPACE}/${BASE_DIR}") {
+        sh(label: 'Install composer', script: '.ci/scripts/install-composer.sh')
+        sh(label: 'Install dependencies', script: 'composer install')
+        sh(label: 'Run tests', script: "vendor/bin/paratest --log-junit=junit-${version}.xml")
       }
+    } catch(e){
+      error(e.toString())
+    } finally {
+      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "${BASE_DIR}/**/junit-*.xml")
     }
   }
 }
 
 def buildWithGitHubNotification(version){
-   return {
-    withGithubNotify(context: "php-${version}") {
-      build(version)
-    }
+  withGithubNotify(context: "php-${version}") {
+    build(version)
   }
 }
