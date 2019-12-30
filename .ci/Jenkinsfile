@@ -85,7 +85,7 @@ def build(version){
     } catch(e){
       error(e.toString())
     } finally {
-      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "${BASE_DIR}/**/junit-*.xml")
+      junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'junit-*.xml')
     }
   }
 }
