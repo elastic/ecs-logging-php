@@ -17,8 +17,7 @@ if (!hash_equals(\$signature, \$hash)) { \
 }"; \
 php /tmp/installer.php --no-ansi --install-dir=. --filename=composer --version=${COMPOSER_VERSION}; \
 composer --ansi --version --no-interaction; \
-rm -f /tmp/installer.php; \
-find /tmp -type d -exec chmod -v 1777 {} +
+rm -f /tmp/installer.php
 
 ## Install dependencies
 composer require --dev brianium/paratest
