@@ -20,4 +20,4 @@ composer --ansi --version --no-interaction; \
 rm -f /tmp/installer.php
 
 ## Install dependencies
-composer require --dev brianium/paratest
+composer require --no-progress --no-ansi --dev brianium/paratest
