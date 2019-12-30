@@ -15,7 +15,7 @@ if (!hash_equals(\$signature, \$hash)) { \
     echo 'Integrity check failed, installer is either corrupt or worse.' . PHP_EOL; \
     exit(1); \
 }"; \
-php /tmp/installer.php --no-ansi --install-dir=/usr/bin --filename=composer --version=${COMPOSER_VERSION}; \
+php /tmp/installer.php --no-ansi --install-dir=. --filename=composer --version=${COMPOSER_VERSION}; \
 composer --ansi --version --no-interaction; \
 rm -f /tmp/installer.php; \
 find /tmp -type d -exec chmod -v 1777 {} +
