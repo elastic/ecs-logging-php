@@ -13,9 +13,9 @@ use Throwable;
 /**
  * Serializes a log message to the Elastic Common Schema (ECS)
  *
- * @version ECS v1.2.0
+ * @version v1.x
  *
- * @see https://www.elastic.co/guide/en/ecs/1.2/ecs-log.html
+ * @see https://www.elastic.co/guide/en/ecs/1.4/ecs-log.html
  * @see Elastic\Monolog\Formatter\ElasticCommonSchemaFormatterTest
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
