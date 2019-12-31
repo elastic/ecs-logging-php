@@ -71,20 +71,27 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
             unset($record['context']['throwable']);
         }
 
-        // Add Tracing Context
-        if (isset($record['context']['trace']) === true) {
-            $message['trace'] = ['id' => trim($record['context']['trace'])];
-            unset($record['context']['trace']);
-
-            if (isset($record['context']['transaction']) === true) {
-                $message['transaction'] = ['id' => trim($record['context']['transaction'])];
-                unset($record['context']['transaction']);
-            }
-        }
-
         // Add Log Message
         if (isset($record['message']) === true) {
             $message['message'] = $record['message'];
+        }
+
+        // Add Tracing Context
+        if (isset($record['context']['tracing']['Elastic\Types\Tracing']) === true) {
+            $message += $record['context']['tracing']['Elastic\Types\Tracing'];
+            unset($record['context']['tracing']);
+        }
+
+        // Add Service Context
+        if (isset($record['context']['service']['Elastic\Types\Service']) === true) {
+            $message += $record['context']['service']['Elastic\Types\Service'];
+            unset($record['context']['service']);
+        }
+
+        // Add User Context
+        if (isset($record['context']['user']['Elastic\Types\User']) === true) {
+            $message += $record['context']['user']['Elastic\Types\User'];
+            unset($record['context']['user']);
         }
 
         // Add ECS Labels
