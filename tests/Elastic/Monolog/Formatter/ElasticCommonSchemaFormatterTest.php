@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
@@ -9,13 +11,12 @@ namespace Elastic\Tests\Monolog\Formatter;
 use \Elastic\Tests\BaseTestCase;
 use Monolog\Logger;
 use Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter;
-
 use Throwable;
 
 /**
  * Test: ElasticCommonSchemaFormatter
  *
- * @version ECS v1.2.0
+ * @version v1.x
  *
  * @see https://www.elastic.co/guide/en/ecs/1.2/ecs-log.html
  * @see Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter
@@ -234,7 +235,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
 
         // Values Correct ?
         $this->assertEquals('BaseTestCase.php', basename($decoded['log']['origin']['file']['name']));
-        $this->assertEquals(42, $decoded['log']['origin']['file']['line']);
+        $this->assertEquals(44, $decoded['log']['origin']['file']['line']);
 
         $this->assertEquals('InvalidArgumentException', $decoded['error']['type']);
         $this->assertEquals($t->getMessage(), $decoded['error']['message']);

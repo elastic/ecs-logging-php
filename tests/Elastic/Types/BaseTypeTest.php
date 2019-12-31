@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
@@ -21,6 +23,20 @@ use Elastic\Types\BaseType;
  */
 class BaseTypeTest extends BaseTestCase
 {
+
+    /**
+     * @covers Elastic\Types\BaseType::toArray
+     */
+    public function testToArray()
+    {
+        $tracing = new Tracing($this->generateTraceId(), $this->generateTransactionId());
+        $this->assertInstanceOf(BaseType::class, $tracing);
+
+        $arr1 = $tracing->toArray();
+        $arr2 = $tracing->jsonSerialize();
+
+        $this->assertEquals($arr1, $arr2);
+    }
 
     /**
      * @covers Elastic\Types\BaseType::__toString
