@@ -6,21 +6,19 @@ declare(strict_types=1);
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
-namespace Elastic\Tests\Monolog\Formatter;
+namespace Elastic\Tests\Monolog\v2\Formatter;
 
 use Monolog\Logger;
 use \Elastic\Tests\BaseTestCase;
-use Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter;
+use Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter;
 use Elastic\Types\{Tracing, User, Service};
 use Throwable;
 
 /**
  * Test: ElasticCommonSchemaFormatter
  *
- * @version v1.x
- *
  * @see https://www.elastic.co/guide/en/ecs/1.2/ecs-log.html
- * @see Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter
+ * @see Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
  */

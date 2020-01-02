@@ -6,7 +6,7 @@ declare(strict_types=1);
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
-namespace Elastic\Monolog\Formatter;
+namespace Elastic\Monolog\v2\Formatter;
 
 use Monolog\Formatter\NormalizerFormatter;
 use Elastic\Types\{Tracing, User, Service};
@@ -15,10 +15,11 @@ use Throwable;
 /**
  * Serializes a log message to the Elastic Common Schema (ECS)
  *
- * @version v1.x
+ * @version Monolog v2.x
+ * @version ECS v1.x
  *
  * @see https://www.elastic.co/guide/en/ecs/1.4/ecs-log.html
- * @see Elastic\Monolog\Formatter\ElasticCommonSchemaFormatterTest
+ * @see Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatterTest
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
  */
