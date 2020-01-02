@@ -94,7 +94,7 @@ class User extends BaseType implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function jsonSerialize()
     {

@@ -62,14 +62,13 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
             ],
         ];
 
-        // Add Exception
-        if (isset($record['context']['throwable']) === true) {
-            if (isset($record['message']) === false) {
-                $message['message'] = $record['context']['throwable']['error']['message'];
-            }
-            $message['error'] = $record['context']['throwable']['error'];
-            $message['log']   = array_merge($message['log'], $record['context']['throwable']['log']);
-            unset($record['context']['throwable']);
+        // Add Error Context
+        if (isset($record['context']['error']['Elastic\Types\Error']) === true) {
+            $message['error'] = $record['context']['error']['Elastic\Types\Error']['error'];
+            $message['log']   = array_merge($message['log'], $record['context']['error']['Elastic\Types\Error']['log']);
+
+            $record['message'] ?? $message['error']['message'];
+            unset($record['context']['error']);
         }
 
         // Add Log Message
@@ -109,34 +108,5 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         }
 
         return $this->toJson($message) . "\n";
-    }
-
-    /**
-     * Normalize Exception and return ECS compliant formart
-     *
-     * @param Throwable $e
-     * @param int $depth, Def: 0
-     *
-     * @return array
-     */
-    protected function normalizeException(Throwable $e, int $depth = 0)
-    {
-        $normalized = parent::normalizeException($e, $depth);
-        return [
-            'error'   => [
-                'type'        => $normalized['class'],
-                'message'     => $normalized['message'],
-                'code'        => $normalized['code'],
-                'stack_trace' => explode(PHP_EOL, $e->getTraceAsString()),
-            ],
-            'log'     => [
-                'origin' => [
-                    'file' => [
-                        'name' => $e->getFile(),
-                        'line' => $e->getLine(),
-                    ],
-                ],
-            ],
-        ];
     }
 }

@@ -4,7 +4,7 @@
 ```php
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use Elastic\Monolog\Formatter\v2\ElasticCommonSchemaFormatter;
+use Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter;
 
 $logger = new Logger('my_ecs_logger');
 $formatter = new ElasticCommonSchemaFormatter();
@@ -15,12 +15,22 @@ $logger->pushHandler($handler);
 
 ## Use ECS Types to enrich your logs
 
-### Log Throwable's
-In order to enrich your error log message with [`Throwable`](https://www.php.net/manual/en/class.throwable.php)'s data, you need to pass
-the _caught_ exception or error with the key `throwable` in the context of the log message.
+### Log Excpetions/Errors/Throwables
+In order to enrich a log event with PHP's [`Throwable`](https://www.php.net/manual/en/class.throwable.php)'s, you need to add to wrap the exception as following.
 ```php
-$logger->error($t->getMessage(), ['throwable' => $t]);
+use Elastic\Types\Error as EcsError;
+
+try {
+    //
+    // something went wrong
+    //
+}
+catch(Excpetion $exception) {
+    $logger->error('some meaningful message', ['error' => new EcsError($exception)]);
+    // log and do other things ..
+}
 ```
+ECS [docs](https://www.elastic.co/guide/en/ecs/current/ecs-error.html) | Service [class](https://github.com/elastic/ecs-logging-php/blob/master/src/Elastic/Types/Error.php)
 
 ### Service
 The service context enables you to provide more attributes describing your service. Setting a version can help you track system behaviour over time.
