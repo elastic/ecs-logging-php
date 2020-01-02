@@ -1,24 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 // Licensed to Elasticsearch B.V under one or more agreements.
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
-namespace Elastic\Tests\Monolog\Formatter;
+namespace Elastic\Tests\Monolog\v2\Formatter;
 
-use \Elastic\Tests\BaseTestCase;
 use Monolog\Logger;
-use Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter;
-
+use \Elastic\Tests\BaseTestCase;
+use Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter;
+use Elastic\Types\{Tracing, User, Service, Error};
 use Throwable;
 
 /**
  * Test: ElasticCommonSchemaFormatter
  *
- * @version ECS v1.2.0
- *
  * @see https://www.elastic.co/guide/en/ecs/1.2/ecs-log.html
- * @see Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter
+ * @see Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
  */
@@ -26,8 +26,8 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
 {
 
     /**
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testFormat()
     {
@@ -71,49 +71,19 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
      */
-    public function testDistributedTracingWithOnlyTraceId()
+    public function testContextWithTracing()
     {
+        $tracing = new Tracing($this->generateTraceId(), $this->generateTransactionId());
         $msg = [
             'level'      => Logger::NOTICE,
             'level_name' => 'NOTICE',
             'channel'    => 'ecs',
             'datetime'   => new \DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
-            'context'    => ['trace' => $this->generateTraceId()],
-            'extra'      => [],
-        ];
-
-        $formatter = new ElasticCommonSchemaFormatter();
-        $doc = $formatter->format($msg);
-
-        $decoded = json_decode($doc, true);
-        $this->assertArrayHasKey('trace', $decoded);
-        $this->assertArrayNotHasKey('transaction', $decoded);
-        $this->assertArrayHasKey('id', $decoded['trace']);
-        $this->assertEquals($msg['context']['trace'], $decoded['trace']['id']);
-    }
-
-    /**
-     * @depends testDistributedTracingWithOnlyTraceId
-     *
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
-     */
-    public function testDistributedTracingWithTraceAndTransactionId()
-    {
-        $msg = [
-            'level'      => Logger::NOTICE,
-            'level_name' => 'NOTICE',
-            'channel'    => 'ecs',
-            'datetime'   => new \DateTimeImmutable("@0"),
-            'message'    => md5(uniqid()),
-            'context'    => [
-                'trace'       => $this->generateTraceId(),
-                'transaction' => $this->generateTransactionId(),
-            ],
+            'context'    => ['tracing' => $tracing],
             'extra'      => [],
         ];
 
@@ -126,25 +96,29 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
         $this->assertArrayHasKey('id', $decoded['trace']);
         $this->assertArrayHasKey('id', $decoded['transaction']);
 
-        $this->assertEquals($msg['context']['trace'], $decoded['trace']['id']);
-        $this->assertEquals($msg['context']['transaction'], $decoded['transaction']['id']);
+        $this->assertEquals($tracing->toArray()['trace']['id'], $decoded['trace']['id']);
+        $this->assertEquals($tracing->toArray()['transaction']['id'], $decoded['transaction']['id']);
     }
 
     /**
-     * @depends testDistributedTracingWithTraceAndTransactionId
+     * @depends testFormat
      *
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
      */
-    public function testDistributedTracingWithOnlyTransactionId()
+    public function testContextWithService()
     {
+        $service = new Service();
+        $service->setId(rand(100, 999));
+        $service->setName('funky-service-01');
+
         $msg = [
             'level'      => Logger::NOTICE,
             'level_name' => 'NOTICE',
             'channel'    => 'ecs',
             'datetime'   => new \DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
-            'context'    => ['transaction' => $this->generateTransactionId()],
+            'context'    => ['service' => $service],
             'extra'      => [],
         ];
 
@@ -152,19 +126,108 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
         $doc = $formatter->format($msg);
 
         $decoded = json_decode($doc, true);
+        $this->assertArrayHasKey('service', $decoded);
+        $this->assertArrayHasKey('id', $decoded['service']);
+        $this->assertArrayHasKey('name', $decoded['service']);
 
-        // Trace is required, not tracing options set
-        // but transaction is in the context
-        $this->assertArrayNotHasKey('trace', $decoded);
-        $this->assertArrayNotHasKey('transaction', $decoded);
-        $this->assertArrayHasKey('transaction', $decoded['labels']);
-        $this->assertEquals($decoded['labels']['transaction'], $msg['context']['transaction']);
+        $this->assertEquals($service->toArray()['service']['id'], $decoded['service']['id']);
+        $this->assertEquals($service->toArray()['service']['name'], $decoded['service']['name']);
     }
 
     /**
      * @depends testFormat
      *
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
+     */
+    public function testContextWithUser()
+    {
+        $user = new User();
+        $user->setId(rand(100, 999));
+        $user->setHash(md5(uniqid()));
+
+        $msg = [
+            'level'      => Logger::NOTICE,
+            'level_name' => 'NOTICE',
+            'channel'    => 'ecs',
+            'datetime'   => new \DateTimeImmutable("@0"),
+            'message'    => md5(uniqid()),
+            'context'    => ['user' => $user],
+            'extra'      => [],
+        ];
+
+        $formatter = new ElasticCommonSchemaFormatter();
+        $doc = $formatter->format($msg);
+
+        $decoded = json_decode($doc, true);
+        $this->assertArrayHasKey('user', $decoded);
+        $this->assertArrayHasKey('id', $decoded['user']);
+        $this->assertArrayHasKey('hash', $decoded['user']);
+
+        $this->assertEquals($user->toArray()['user']['id'], $decoded['user']['id']);
+        $this->assertEquals($user->toArray()['user']['hash'], $decoded['user']['hash']);
+    }
+
+    /**
+     * @depends testFormat
+     *
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
+     */
+    public function testContextWithError()
+    {
+        $t = $this->generateException();
+        $error = new Error($t);
+
+        $msg = [
+            'level'      => Logger::ERROR,
+            'level_name' => 'ERROR',
+            'channel'    => 'ecs',
+            'datetime'   => new \DateTimeImmutable("@0"),
+            'message'    => md5(uniqid()),
+            'context'    => ['error' => $error],
+            'extra'      => [],
+        ];
+
+        $formatter = new ElasticCommonSchemaFormatter();
+        $doc = $formatter->format($msg);
+        $decoded = json_decode($doc, true);
+
+        // ECS Struct ?
+        $this->assertArrayHasKey('error', $decoded);
+        $this->assertArrayHasKey('type', $decoded['error']);
+        $this->assertArrayHasKey('message', $decoded['error']);
+        $this->assertArrayHasKey('code', $decoded['error']);
+        $this->assertArrayHasKey('stack_trace', $decoded['error']);
+
+        $this->assertArrayHasKey('log', $decoded);
+        $this->assertArrayHasKey('origin', $decoded['log']);
+        $this->assertArrayHasKey('file', $decoded['log']['origin']);
+        $this->assertArrayHasKey('name', $decoded['log']['origin']['file']);
+        $this->assertArrayHasKey('line', $decoded['log']['origin']['file']);
+
+        // Ensure Array merging is sound ..
+        $this->assertArrayHasKey('level', $decoded['log']);
+        $this->assertArrayHasKey('logger', $decoded['log']);
+
+        // Values Correct ?
+        $this->assertEquals('BaseTestCase.php', basename($decoded['log']['origin']['file']['name']));
+        $this->assertEquals(44, $decoded['log']['origin']['file']['line']);
+
+        $this->assertEquals('InvalidArgumentException', $decoded['error']['type']);
+        $this->assertEquals($t->getMessage(), $decoded['error']['message']);
+        $this->assertEquals($t->getCode(), $decoded['error']['code']);
+        $this->assertIsArray($decoded['error']['stack_trace']);
+        $this->assertNotEmpty($decoded['error']['stack_trace']);
+
+        // Throwable removed from Context/Labels ?
+        $this->assertArrayNotHasKey('labels', $decoded);
+    }
+
+    /**
+     * @depends testFormat
+     *
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
      */
     public function testTags()
     {
@@ -194,63 +257,8 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::normalizeException
-     */
-    public function testNormalizeException()
-    {
-        $t = $this->generateException();
-        $msg = [
-            'level'      => Logger::ERROR,
-            'level_name' => 'ERROR',
-            'channel'    => 'ecs',
-            'datetime'   => new \DateTimeImmutable("@0"),
-            'message'    => md5(uniqid()),
-            'context'    => ['throwable' => $t],
-            'extra'      => [],
-        ];
-
-        $formatter = new ElasticCommonSchemaFormatter();
-
-        $doc = $formatter->format($msg);
-        $decoded = json_decode($doc, true);
-
-        // ECS Struct ?
-        $this->assertArrayHasKey('error', $decoded);
-        $this->assertArrayHasKey('type', $decoded['error']);
-        $this->assertArrayHasKey('message', $decoded['error']);
-        $this->assertArrayHasKey('code', $decoded['error']);
-        $this->assertArrayHasKey('stack_trace', $decoded['error']);
-
-        $this->assertArrayHasKey('log', $decoded);
-        $this->assertArrayHasKey('origin', $decoded['log']);
-        $this->assertArrayHasKey('file', $decoded['log']['origin']);
-        $this->assertArrayHasKey('name', $decoded['log']['origin']['file']);
-        $this->assertArrayHasKey('line', $decoded['log']['origin']['file']);
-
-        // Ensure Array merging is sound ..
-        $this->assertArrayHasKey('level', $decoded['log']);
-        $this->assertArrayHasKey('logger', $decoded['log']);
-
-        // Values Correct ?
-        $this->assertEquals('BaseTestCase.php', basename($decoded['log']['origin']['file']['name']));
-        $this->assertEquals(42, $decoded['log']['origin']['file']['line']);
-
-        $this->assertEquals('InvalidArgumentException', $decoded['error']['type']);
-        $this->assertEquals($t->getMessage(), $decoded['error']['message']);
-        $this->assertEquals($t->getCode(), $decoded['error']['code']);
-        $this->assertIsArray($decoded['error']['stack_trace']);
-        $this->assertNotEmpty($decoded['error']['stack_trace']);
-
-        // Throwable removed from Context/Labels ?
-        $this->assertArrayNotHasKey('labels', $decoded);
-    }
-
-    /**
-     * @depends testFormat
-     *
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testSanitizeOfLabelKeys()
     {
@@ -268,6 +276,9 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
                 'a.b.c'   => 'a_b_c',
                 '.hello'  => '_hello',
                 'lorem.'  => 'lorem_',
+                'st*ar'   => 'st_ar',
+                'sla\sh'  => 'sla_sh',
+                'a.b*c\d' => 'a_b_c_d',
             ],
             'extra'      => [],
         ];
