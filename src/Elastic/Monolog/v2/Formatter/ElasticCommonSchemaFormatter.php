@@ -99,7 +99,7 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         if (empty($record['context']) === false) {
             $message['labels'] = [];
             foreach ($record['context'] as $key => $val) {
-                $message['labels'][str_replace(['.', ' '], '_', trim($key))] = $val;
+                $message['labels'][str_replace(['.', ' ', '*', '\\'], '_', trim($key))] = $val;
             }
         }
 

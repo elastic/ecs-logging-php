@@ -275,6 +275,9 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
                 'a.b.c'   => 'a_b_c',
                 '.hello'  => '_hello',
                 'lorem.'  => 'lorem_',
+                'st*ar'   => 'st_ar',
+                'sla\sh'  => 'sla_sh',
+                'a.b*c\d' => 'a_b_c_d',
             ],
             'extra'      => [],
         ];
