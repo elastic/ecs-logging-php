@@ -1,0 +1,5 @@
+---
+- job:
+    name: apm-agent-php/ecs-logging-php-mbp
+    display-name: ecs-logging-php
+    description: Centralized logging for PHP applications with the Elastic stack

@@ -1,3 +1,5 @@
+[![Build Status](https://apm-ci.elastic.co/buildStatus/icon?job=apm-agent-php%2Fecs-logging-php-mbp%2Fmaster)](https://apm-ci.elastic.co/job/apm-agent-php/job/ecs-logging-php-mbp/job/master/)
+
 # ECS Logging for PHP
 
 Transform your application logs to structured logs that comply with the [Elastic Common Schema (ECS)](https://www.elastic.co/guide/en/ecs/current/ecs-reference.html).
