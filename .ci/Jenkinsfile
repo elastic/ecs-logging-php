@@ -34,6 +34,9 @@ pipeline {
       }
     }
     stage('Sanity checks') {
+      environment {
+        HOME = "${env.WORKSPACE}"
+      }
       options { skipDefaultCheckout() }
       steps {
         deleteDir()
