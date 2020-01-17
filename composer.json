@@ -20,7 +20,7 @@
     "require-dev": {
         "jakub-onderka/php-parallel-lint": "^1.0",
         "squizlabs/php_codesniffer": "3.*",
-        "phpunit/phpunit": "^8.4",
+        "brianium/paratest": "^3.1",
         "monolog/monolog": "^2.0"
     },
     "autoload": {
@@ -37,7 +37,7 @@
             "./vendor/bin/parallel-lint . --exclude vendor",
             "./vendor/bin/phpcs --standard=phpcs.xml --extensions=php --encoding=utf-8 --tab-width=4 -sp src/Elastic",
             "./vendor/bin/phpcs --standard=phpcs.xml --extensions=php --encoding=utf-8 --tab-width=4 -sp tests/Elastic",
-            "./vendor/bin/phpunit -c phpunit.xml.dist --bootstrap tests/bootstrap.php"
+            "./vendor/bin/paratest -c phpunit.xml.dist --bootstrap tests/bootstrap.php --log-junit=junit-${VERSION}.xml"
         ]
     },
     "config": {
