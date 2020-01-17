@@ -80,7 +80,7 @@ def build(version){
       docker.image("php:${version}").inside("-e PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${WORKSPACE}/${BASE_DIR}") {
         sh(label: 'Install composer', script: '.ci/scripts/install-composer.sh')
         sh(label: 'Install dependencies', script: 'composer --no-progress --no-ansi install')
-        sh(label: 'Run tests', script: "export VERSION=${version} && composer test")
+        sh(label: 'Run tests', script: "VERSION=${version} composer test")
       }
     } catch(e){
       error(e.toString())
