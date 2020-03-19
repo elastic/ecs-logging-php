@@ -7,13 +7,19 @@ In combination with [filebeat](https://www.elastic.co/products/beats/filebeat) y
 This library allows you to provide more observability for your PHP applications as can e.g. corrolate your logs with e.g. APM traces.
 See [ecs-logging](https://github.com/elastic/ecs-logging) for other ECS logging libraries and more resources about ECS & logging.
 
+---
+
+**Please note** that this library is in a **beta** version and backwards-incompatible changes might be introduced in future releases. While we strive to comply to [semver](https://semver.org/), we can not guarantee to avoid breaking changes in minor releases.
+
+---
+
 ## Install
 ```
 composer require elastic/ecs-logging
 ```
 
 ## Examples and Usage
-* [Monolog v2](https://github.com/elastic/ecs-logging-php/blob/master/docs/Monolog_v2.md)
+* [Monolog v2.0](https://github.com/elastic/ecs-logging-php/blob/master/docs/Monolog_v2.md)
 
 ## Library Support
 * Currently only [Monolog:2.*](https://github.com/Seldaek/monolog) is supported.
