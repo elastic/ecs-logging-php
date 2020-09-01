@@ -62,7 +62,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
         $this->assertEquals(['level', 'logger'], array_keys($decoded['log']));
 
         // Values correctly propagated
-        $this->assertEquals('1970-01-01T00:00:00.000000Z', $decoded['@timestamp']);
+        $this->assertEquals('1970-01-01T00:00:00.000000+00:00', $decoded['@timestamp']);
         $this->assertEquals($msg['level_name'], $decoded['log']['level']);
         $this->assertEquals($msg['channel'], $decoded['log']['logger']);
         $this->assertEquals($msg['message'], $decoded['message']);
