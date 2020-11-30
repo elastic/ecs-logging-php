@@ -15,7 +15,7 @@ $logger->pushHandler($handler);
 
 ## Use ECS Types to enrich your logs
 
-### Log Excpetions/Errors/Throwables
+### Log Exceptions/Errors/Throwables
 In order to enrich a log event with PHP's [`Throwable`](https://www.php.net/manual/en/class.throwable.php)'s, you need to add to wrap the exception as following.
 ```php
 use Elastic\Types\Error as EcsError;
@@ -25,7 +25,7 @@ try {
     // something went wrong
     //
 }
-catch(Excpetion $exception) {
+catch(\Exception $exception) {
     $logger->error('some meaningful message', ['error' => new EcsError($exception)]);
     // log and do other things ..
 }
