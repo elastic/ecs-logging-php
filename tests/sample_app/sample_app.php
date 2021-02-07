@@ -27,8 +27,9 @@ try {
     $log->error(
         'My example log message',
         [
-            'error'      => new EcsError($ex),
-            'my_ctx_key' => 'my_ctx_value',
+            'error'    => new EcsError($ex),
+            'labels'   => ['my_ctx_key' => 'my_ctx_value'],
+            'trace.id' => 'abc-xyz',
         ]
     );
 }
