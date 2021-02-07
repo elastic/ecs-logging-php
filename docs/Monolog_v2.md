@@ -4,7 +4,7 @@
 ```php
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter;
+use Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter;
 
 $logger = new Logger('my_ecs_logger');
 $formatter = new ElasticCommonSchemaFormatter();
