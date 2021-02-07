@@ -48,69 +48,79 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
      * @link https://www.elastic.co/guide/en/ecs/1.1/ecs-base.html
      * @link https://www.elastic.co/guide/en/ecs/current/ecs-tracing.html
      */
-    public function format(array $record): string
+    public function format(array $inRecord): string
     {
-        $record = $this->normalize($record);
+        $inRecord = $this->normalize($inRecord);
 
         // Build Skeleton with "@timestamp" and "log.level"
-        $message = [
-            '@timestamp' => $record['datetime'],
-            'log.level'  => $record['level_name'],
+        $outRecord = [
+            '@timestamp' => $inRecord['datetime'],
+            'log.level'  => $inRecord['level_name'],
         ];
 
         // Add "message"
-        if (isset($record['message']) === true) {
-            $message['message'] = $record['message'];
+        if (isset($inRecord['message']) === true) {
+            $outRecord['message'] = $inRecord['message'];
         }
 
         // Add "ecs.version"
-        $message['ecs.version'] = self::ECS_VERSION;
+        $outRecord['ecs.version'] = self::ECS_VERSION;
 
         // Add "log": { "logger": ..., ... }
-        $message['log'] = [
-            'logger' => $record['channel'],
+        $outRecord['log'] = [
+            'logger' => $inRecord['channel'],
         ];
 
         // Add Error Context
-        if (isset($record['context']['error']['Elastic\Types\Error']) === true) {
-            $message['error'] = $record['context']['error']['Elastic\Types\Error']['error'];
-            $message['log'] = array_merge($message['log'], $record['context']['error']['Elastic\Types\Error']['log']);
+        if (isset($inRecord['context']['error']['Elastic\Types\Error']) === true) {
+            $outRecord['error'] = $inRecord['context']['error']['Elastic\Types\Error']['error'];
+            $outRecord['log'] = array_merge($outRecord['log'], $inRecord['context']['error']['Elastic\Types\Error']['log']);
 
-            $record['message'] ?? $message['error']['message'];
-            unset($record['context']['error']);
+            $inRecord['message'] ?? $outRecord['error']['message'];
+            unset($inRecord['context']['error']);
         }
 
         // Add Tracing Context
-        if (isset($record['context']['tracing']['Elastic\Types\Tracing']) === true) {
-            $message += $record['context']['tracing']['Elastic\Types\Tracing'];
-            unset($record['context']['tracing']);
+        if (isset($inRecord['context']['tracing']['Elastic\Types\Tracing']) === true) {
+            $outRecord += $inRecord['context']['tracing']['Elastic\Types\Tracing'];
+            unset($inRecord['context']['tracing']);
         }
 
         // Add Service Context
-        if (isset($record['context']['service']['Elastic\Types\Service']) === true) {
-            $message += $record['context']['service']['Elastic\Types\Service'];
-            unset($record['context']['service']);
+        if (isset($inRecord['context']['service']['Elastic\Types\Service']) === true) {
+            $outRecord += $inRecord['context']['service']['Elastic\Types\Service'];
+            unset($inRecord['context']['service']);
         }
 
         // Add User Context
-        if (isset($record['context']['user']['Elastic\Types\User']) === true) {
-            $message += $record['context']['user']['Elastic\Types\User'];
-            unset($record['context']['user']);
+        if (isset($inRecord['context']['user']['Elastic\Types\User']) === true) {
+            $outRecord += $inRecord['context']['user']['Elastic\Types\User'];
+            unset($inRecord['context']['user']);
         }
 
         // Add ECS Labels
-        if (empty($record['context']) === false) {
-            $message['labels'] = [];
-            foreach ($record['context'] as $key => $val) {
-                $message['labels'][str_replace(['.', ' ', '*', '\\'], '_', trim($key))] = $val;
+        $inContext = $inRecord['context'];
+        if (!empty($inContext)) {
+            if (array_key_exists('labels', $inContext)) {
+                $outLabels = [];
+                foreach ($inContext['labels'] as $key => $val) {
+                    $outLabels[str_replace(['.', ' ', '*', '\\'], '_', trim($key))] = $val;
+                }
+                $outRecord['labels'] = $outLabels;
+            }
+
+            // Context should go to the top of the out record
+            // We don't use array_merge to preserve the order (for better human readability)
+            foreach ($inContext as $key => $val) {
+                $outRecord[$key] = $val;
             }
         }
 
         // Add ECS Tags
         if (empty($this->tags) === false) {
-            $message['tags'] = $this->normalize($this->tags);
+            $outRecord['tags'] = $this->normalize($this->tags);
         }
 
-        return $this->toJson($message) . "\n";
+        return $this->toJson($outRecord) . "\n";
     }
 }
