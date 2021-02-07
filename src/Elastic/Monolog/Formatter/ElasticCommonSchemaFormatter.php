@@ -48,7 +48,7 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
      * @link https://www.elastic.co/guide/en/ecs/1.1/ecs-base.html
      * @link https://www.elastic.co/guide/en/ecs/current/ecs-tracing.html
      */
-    public function format(array $record): string
+    public function format(array $inRecord): string
     {
         $inRecord = $this->normalize($record);
 
@@ -114,6 +114,12 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
                 }
 
                 $outRecord[$contextKey] = $contextVal;
+            }
+
+            // Context should go to the top of the out record
+            // We don't use array_merge to preserve the order (for better human readability)
+            foreach ($inContext as $key => $val) {
+                $outRecord[$key] = $val;
             }
         }
 
