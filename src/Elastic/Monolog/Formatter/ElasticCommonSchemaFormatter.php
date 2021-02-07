@@ -6,11 +6,9 @@ declare(strict_types=1);
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
-namespace Elastic\Monolog\v2\Formatter;
+namespace Elastic\Monolog\Formatter;
 
 use Monolog\Formatter\NormalizerFormatter;
-use Elastic\Types\{Tracing, User, Service};
-use Throwable;
 
 /**
  * Serializes a log message to the Elastic Common Schema (ECS)
@@ -18,13 +16,14 @@ use Throwable;
  * @version Monolog v2.x
  * @version ECS v1.x
  *
- * @see https://www.elastic.co/guide/en/ecs/1.4/ecs-log.html
- * @see Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatterTest
+ * @see     https://www.elastic.co/guide/en/ecs/1.4/ecs-log.html
+ * @see     \Elastic\Tests\Monolog\Formatter\ElasticCommonSchemaFormatterTest
  *
- * @author Philip Krauss <philip.krauss@elastic.co>
+ * @author  Philip Krauss <philip.krauss@elastic.co>
  */
 class ElasticCommonSchemaFormatter extends NormalizerFormatter
 {
+    private const ECS_VERSION = '1.2.0';
 
     /**
      * @var array
@@ -53,27 +52,32 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
     {
         $record = $this->normalize($record);
 
-        // Build Skeleton
+        // Build Skeleton with "@timestamp" and "log.level"
         $message = [
             '@timestamp' => $record['datetime'],
-            'log'        => [
-                'level'  => $record['level_name'],
-                'logger' => $record['channel'],
-            ],
+            'log.level'  => $record['level_name'],
+        ];
+
+        // Add "message"
+        if (isset($record['message']) === true) {
+            $message['message'] = $record['message'];
+        }
+
+        // Add "ecs.version"
+        $message['ecs.version'] = self::ECS_VERSION;
+
+        // Add "log": { "logger": ..., ... }
+        $message['log'] = [
+            'logger' => $record['channel'],
         ];
 
         // Add Error Context
         if (isset($record['context']['error']['Elastic\Types\Error']) === true) {
             $message['error'] = $record['context']['error']['Elastic\Types\Error']['error'];
-            $message['log']   = array_merge($message['log'], $record['context']['error']['Elastic\Types\Error']['log']);
+            $message['log'] = array_merge($message['log'], $record['context']['error']['Elastic\Types\Error']['log']);
 
             $record['message'] ?? $message['error']['message'];
             unset($record['context']['error']);
-        }
-
-        // Add Log Message
-        if (isset($record['message']) === true) {
-            $message['message'] = $record['message'];
         }
 
         // Add Tracing Context

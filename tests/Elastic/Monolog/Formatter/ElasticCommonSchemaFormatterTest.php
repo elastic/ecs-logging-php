@@ -6,28 +6,29 @@ declare(strict_types=1);
 // Elasticsearch B.V licenses this file to you under the Apache 2.0 License.
 // See the LICENSE file in the project root for more information
 
-namespace Elastic\Tests\Monolog\v2\Formatter;
+namespace Elastic\Tests\Monolog\Formatter;
 
+use DateTimeImmutable;
+use Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter;
+use Elastic\Tests\BaseTestCase;
+use Elastic\Types\{Error, Service, Tracing, User};
 use Monolog\Logger;
-use \Elastic\Tests\BaseTestCase;
-use Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter;
-use Elastic\Types\{Tracing, User, Service, Error};
-use Throwable;
 
 /**
  * Test: ElasticCommonSchemaFormatter
  *
  * @see https://www.elastic.co/guide/en/ecs/1.2/ecs-log.html
- * @see Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter
+ * @see \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
  */
 class ElasticCommonSchemaFormatterTest extends BaseTestCase
 {
+    private const ECS_VERSION = '1.2.0';
 
     /**
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testFormat()
     {
@@ -35,7 +36,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
             'level'      => Logger::INFO,
             'level_name' => 'INFO',
             'channel'    => 'ecs',
-            'datetime'   => new \DateTimeImmutable("@0"),
+            'datetime'   => new DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
             'context'    => [],
             'extra'      => [],
@@ -52,27 +53,28 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
         $decoded = json_decode($doc, true);
         $this->assertIsArray($decoded);
         $this->assertArrayHasKey('@timestamp', $decoded);
+        $this->assertArrayHasKey('log.level', $decoded);
         $this->assertArrayHasKey('log', $decoded);
-        $this->assertArrayHasKey('level', $decoded['log']);
         $this->assertArrayHasKey('logger', $decoded['log']);
         $this->assertArrayHasKey('message', $decoded);
 
         // Not other keys are set for the MVP
-        $this->assertEquals(['@timestamp', 'log', 'message'], array_keys($decoded));
-        $this->assertEquals(['level', 'logger'], array_keys($decoded['log']));
+        $this->assertEquals(['@timestamp', 'log.level', 'message', 'ecs.version', 'log'], array_keys($decoded));
+        $this->assertEquals(['logger'], array_keys($decoded['log']));
 
         // Values correctly propagated
         $this->assertEquals('1970-01-01T00:00:00.000000Z', $decoded['@timestamp']);
-        $this->assertEquals($msg['level_name'], $decoded['log']['level']);
-        $this->assertEquals($msg['channel'], $decoded['log']['logger']);
+        $this->assertEquals($msg['level_name'], $decoded['log.level']);
         $this->assertEquals($msg['message'], $decoded['message']);
+        $this->assertEquals(self::ECS_VERSION, $decoded['ecs.version']);
+        $this->assertEquals($msg['channel'], $decoded['log']['logger']);
     }
 
     /**
      * @depends testFormat
      *
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testContextWithTracing()
     {
@@ -81,7 +83,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
             'level'      => Logger::NOTICE,
             'level_name' => 'NOTICE',
             'channel'    => 'ecs',
-            'datetime'   => new \DateTimeImmutable("@0"),
+            'datetime'   => new DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
             'context'    => ['tracing' => $tracing],
             'extra'      => [],
@@ -103,8 +105,8 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testContextWithService()
     {
@@ -116,7 +118,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
             'level'      => Logger::NOTICE,
             'level_name' => 'NOTICE',
             'channel'    => 'ecs',
-            'datetime'   => new \DateTimeImmutable("@0"),
+            'datetime'   => new DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
             'context'    => ['service' => $service],
             'extra'      => [],
@@ -137,8 +139,8 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testContextWithUser()
     {
@@ -150,7 +152,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
             'level'      => Logger::NOTICE,
             'level_name' => 'NOTICE',
             'channel'    => 'ecs',
-            'datetime'   => new \DateTimeImmutable("@0"),
+            'datetime'   => new DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
             'context'    => ['user' => $user],
             'extra'      => [],
@@ -171,8 +173,8 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testContextWithError()
     {
@@ -183,7 +185,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
             'level'      => Logger::ERROR,
             'level_name' => 'ERROR',
             'channel'    => 'ecs',
-            'datetime'   => new \DateTimeImmutable("@0"),
+            'datetime'   => new DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
             'context'    => ['error' => $error],
             'extra'      => [],
@@ -207,7 +209,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
         $this->assertArrayHasKey('line', $decoded['log']['origin']['file']);
 
         // Ensure Array merging is sound ..
-        $this->assertArrayHasKey('level', $decoded['log']);
+        $this->assertArrayHasKey('log.level', $decoded);
         $this->assertArrayHasKey('logger', $decoded['log']);
 
         // Values Correct ?
@@ -227,7 +229,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
      */
     public function testTags()
     {
@@ -235,7 +237,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
             'level'      => Logger::ERROR,
             'level_name' => 'ERROR',
             'channel'    => 'ecs',
-            'datetime'   => new \DateTimeImmutable("@0"),
+            'datetime'   => new DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
             'context'    => [],
             'extra'      => [],
@@ -257,8 +259,8 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testSanitizeOfLabelKeys()
     {
@@ -266,7 +268,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
             'level'      => Logger::NOTICE,
             'level_name' => 'NOTICE',
             'channel'    => 'ecs',
-            'datetime'   => new \DateTimeImmutable("@0"),
+            'datetime'   => new DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
             'context'    => [
                 'sim ple' => 'sim_ple',

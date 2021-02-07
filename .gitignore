@@ -1,4 +1,26 @@
+# Composer
 composer.lock
+composer.phar
 vendor/
+
+# JetBrains PhpStorm
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Generated files
+_GENERATED/
+
+# PHPUnit
 .phpunit.result.cache
 junit-*.xml
+
+# PHP_CodeSniffer
+.php_cs.cache
+
+# Built documentation
+html_docs
+
+# Mac
+.DS_Store

@@ -10,6 +10,10 @@
             "name": "Philip Krauss",
             "email": "philip.krauss@elastic.co",
             "homepage": "https://github.com/philkra"
+        },
+        {
+            "name": "Sergey Kleyman",
+            "homepage": "https://github.com/SergeyKleyman"
         }
     ],
     "require": {
@@ -34,10 +38,10 @@
     },
     "scripts": {
         "test": [
-            "./vendor/bin/parallel-lint . --exclude vendor",
-            "./vendor/bin/phpcs --standard=phpcs.xml --extensions=php --encoding=utf-8 --tab-width=4 -sp src/Elastic",
-            "./vendor/bin/phpcs --standard=phpcs.xml --extensions=php --encoding=utf-8 --tab-width=4 -sp tests/Elastic",
-            "./vendor/bin/paratest -c phpunit.xml.dist --bootstrap tests/bootstrap.php --log-junit=junit-${VERSION}.xml"
+            "parallel-lint . --exclude vendor",
+            "phpcs --standard=phpcs.xml --extensions=php --encoding=utf-8 --tab-width=4 -sp src/Elastic",
+            "phpcs --standard=phpcs.xml --extensions=php --encoding=utf-8 --tab-width=4 -sp tests/Elastic",
+            "paratest -c phpunit.xml.dist --bootstrap tests/bootstrap.php --log-junit=junit-${VERSION}.xml"
         ]
     },
     "config": {
