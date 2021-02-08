@@ -1,0 +1,79 @@
+[[setup]]
+== Get started
+
+NOTE: ECS logging for PHP is currently only available for Monolog v2.*.
+
+[float]
+[[setup-step-1]]
+=== Step 1: Set up application logging
+
+[float]
+==== Add the dependency
+
+[source,cmd]
+----
+composer require elastic/ecs-logging
+----
+
+[float]
+==== Configure Monolog logger
+
+`Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter` implements Monolog's https://github.com/Seldaek/monolog/blob/2.0.0/src/Monolog/Formatter/FormatterInterface.php[`FormatterInterface`]
+and thus it can be used when setting up Monolog logger.
+
+For example:
+
+[source,php]
+----
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter;
+
+$log = new Logger('MyLogger');
+$handler = new StreamHandler('php://stdout', Logger::DEBUG);
+$handler->setFormatter(new ElasticCommonSchemaFormatter());
+$log->pushHandler($handler);
+
+$log->warning('Be aware that...');
+----
+
+Logs the following JSON to standard output:
+
+[source,json]
+----
+{"@timestamp":"2021-02-07T18:08:07.229676Z","log.level":"WARNING","message":"Be aware that...","ecs.version":"1.2.0","log":{"logger":"MyLogger"}}
+----
+
+Additionally, it allows for adding additional keys to messages.
+
+For example:
+
+[source,php]
+----
+$log->info('My message', ['labels' => ['my_label_key' => 'my_label_value'], 'trace.id' => 'abc-xyz']);
+----
+
+Logs the following (multi-line formatted for better readability):
+
+[source,json]
+----
+{
+    "@timestamp": "2021-02-08T06:36:38.913824Z",
+    "log.level": "INFO",
+    "message": "My message",
+    "ecs.version": "1.2.0",
+    "log": {
+        "logger": "MyLogger"
+    },
+    "labels": {
+        "my_label_key": "my_label_value"
+    },
+    "trace.id": "abc-xyz"
+}
+----
+
+[float]
+[[setup-step-2]]
+=== Step 2: Configure Filebeat
+
+include::{ecs-repo-dir}/setup.asciidoc[tag=configure-filebeat]
