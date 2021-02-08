@@ -48,7 +48,7 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
      * @link https://www.elastic.co/guide/en/ecs/1.1/ecs-base.html
      * @link https://www.elastic.co/guide/en/ecs/current/ecs-tracing.html
      */
-    public function format(array $inRecord): string
+    public function format(array $record): string
     {
         $inRecord = $this->normalize($record);
 
@@ -112,9 +112,6 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
                     $outRecord['labels'] = $outLabels;
                     continue;
                 }
-
-                $outRecord[$contextKey] = $contextVal;
-            }
 
                 $outRecord[$contextKey] = $contextVal;
             }

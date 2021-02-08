@@ -15,8 +15,6 @@ $handler->setFormatter(new ElasticCommonSchemaFormatter());
 $log->pushHandler($handler);
 
 $log->notice('Hi, I am the spec for the ECS logging libraries.');
-$log->warning('Be aware that...');
-$log->info('My message', ['labels' => ['my_label_key' => 'my_label_value'], 'trace.id' => 'abc-xyz']);
 
 function f1()
 {
