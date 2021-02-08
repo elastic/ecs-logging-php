@@ -116,10 +116,7 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
                 $outRecord[$contextKey] = $contextVal;
             }
 
-            // Context should go to the top of the out record
-            // We don't use array_merge to preserve the order (for better human readability)
-            foreach ($inContext as $key => $val) {
-                $outRecord[$key] = $val;
+                $outRecord[$contextKey] = $contextVal;
             }
         }
 
