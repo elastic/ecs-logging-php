@@ -3,9 +3,10 @@
 # ECS Logging for PHP
 
 Transform your application logs to structured logs that comply with the [Elastic Common Schema (ECS)](https://www.elastic.co/guide/en/ecs/current/ecs-reference.html).
-In combination with [filebeat](https://www.elastic.co/products/beats/filebeat) you can send your logs directly to Elasticsearch and leverage [Kibana's Logs UI](https://www.elastic.co/guide/en/infrastructure/guide/current/logs-ui-overview.html) to inspect all logs in one single place.
-This library allows you to provide more observability for your PHP applications as can e.g. corrolate your logs with e.g. APM traces.
-See [ecs-logging](https://github.com/elastic/ecs-logging) for other ECS logging libraries and more resources about ECS & logging.
+In combination with [Filebeat](https://www.elastic.co/products/beats/filebeat), send your logs directly to Elasticsearch and leverage [Kibana's Logs app](https://www.elastic.co/guide/en/observability/current/monitor-logs.html) to inspect all of your logs in a single place.
+This provides more observability for your PHP applications, for example, by correlating your logs with APM traces.
+
+See the [PHP ECS logging documentation](https://www.elastic.co/guide/en/ecs-logging/php/current/intro.html) to get started, or the [ecs-logging repo](https://github.com/elastic/ecs-logging) for other ECS logging libraries and more resources about ECS & logging.
 
 ---
 
@@ -26,6 +27,7 @@ composer require elastic/ecs-logging
 * The major version of this library is compatible with the major version of ECS.
 
 ## References
+* [Documentation](https://www.elastic.co/guide/en/ecs-logging/php/current/intro.html)
 * Introduction to ECS [blog post](https://www.elastic.co/blog/introducing-the-elastic-common-schema).
 * Logs UI [blog post](https://www.elastic.co/blog/infrastructure-and-logs-ui-new-ways-for-ops-to-interact-with-elasticsearch).
 
