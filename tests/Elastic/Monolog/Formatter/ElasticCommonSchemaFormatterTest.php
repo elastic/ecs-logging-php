@@ -17,8 +17,8 @@ use Monolog\Logger;
 /**
  * Test: ElasticCommonSchemaFormatter
  *
- * @see https://www.elastic.co/guide/en/ecs/1.2/ecs-log.html
- * @see \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter
+ * @see    https://www.elastic.co/guide/en/ecs/1.2/ecs-log.html
+ * @see    \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
  */
@@ -73,8 +73,8 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testContextWithTracing()
     {
@@ -105,8 +105,8 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testContextWithService()
     {
@@ -139,8 +139,8 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testContextWithUser()
     {
@@ -173,8 +173,8 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testContextWithError()
     {
@@ -229,7 +229,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @depends testFormat
      *
-     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
      */
     public function testTags()
     {
@@ -256,43 +256,79 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
         $this->assertEquals($tags, $decoded['tags']);
     }
 
+    private static function isPrefixOf(string $prefix, string $text, bool $isCaseSensitive = true): bool
+    {
+        $prefixLen = strlen($prefix);
+        if ($prefixLen === 0) {
+            return true;
+        }
+
+        return substr_compare(
+            $text /* <- haystack */,
+            $prefix /* <- needle */,
+            0 /* <- offset */,
+            $prefixLen /* <- length */,
+            !$isCaseSensitive /* <- case_insensitivity */
+        ) === 0;
+    }
+
     /**
      * @depends testFormat
      *
-     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
      */
     public function testSanitizeOfLabelKeys()
     {
-        $msg = [
+        $inLabels = [
+            'sim ple' => 'sim_ple',
+            ' lpad'   => 'lpad',
+            'rpad '   => 'rpad',
+            'foo.bar' => 'foo_bar',
+            'a.b.c'   => 'a_b_c',
+            '.hello'  => '_hello',
+            'lorem.'  => 'lorem_',
+            'st*ar'   => 'st_ar',
+            'sla\sh'  => 'sla_sh',
+            'a.b*c\d' => 'a_b_c_d',
+        ];
+
+        $inContext = ['labels' => $inLabels];
+        foreach ($inLabels as $key => $val) {
+            $inContext['top_level_' . $key] = $key;
+        }
+
+        $inRecord = [
             'level'      => Logger::NOTICE,
             'level_name' => 'NOTICE',
             'channel'    => 'ecs',
             'datetime'   => new DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
-            'context'    => [
-                'sim ple' => 'sim_ple',
-                ' lpad'   => 'lpad',
-                'rpad '   => 'rpad',
-                'foo.bar' => 'foo_bar',
-                'a.b.c'   => 'a_b_c',
-                '.hello'  => '_hello',
-                'lorem.'  => 'lorem_',
-                'st*ar'   => 'st_ar',
-                'sla\sh'  => 'sla_sh',
-                'a.b*c\d' => 'a_b_c_d',
-            ],
+            'context'    => $inContext,
             'extra'      => [],
         ];
 
         $formatter = new ElasticCommonSchemaFormatter();
-        $doc = $formatter->format($msg);
+        $doc = $formatter->format($inRecord);
         $decoded = json_decode($doc, true);
 
         $this->assertArrayHasKey('labels', $decoded);
-        foreach ($msg['context'] as $keyPrevious => $keySanitized) {
-            $this->assertArrayNotHasKey($keyPrevious, $decoded['labels'], $keyPrevious);
-            $this->assertArrayHasKey($keySanitized, $decoded['labels'], $keySanitized);
+        $outLabels = $decoded['labels'];
+        $this->assertCount(count($inLabels), $outLabels);
+        foreach ($inLabels as $keyPrevious => $keySanitized) {
+            $this->assertArrayNotHasKey($keyPrevious, $outLabels, $keyPrevious);
+            $this->assertArrayHasKey($keySanitized, $outLabels, $keySanitized);
         }
+
+        $topLevelFoundCount = 0;
+        foreach ($inContext as $key => $val) {
+            if (!self::isPrefixOf('top_level_', $key)) {
+                continue;
+            }
+
+            $this->assertSame('top_level_' . $val, $key);
+            ++$topLevelFoundCount;
+        }
+        $this->assertSame(count($inLabels), $topLevelFoundCount);
     }
 }

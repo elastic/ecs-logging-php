@@ -101,18 +101,19 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         // Add ECS Labels
         $inContext = $inRecord['context'];
         if (!empty($inContext)) {
-            if (array_key_exists('labels', $inContext)) {
-                $outLabels = [];
-                foreach ($inContext['labels'] as $key => $val) {
-                    $outLabels[str_replace(['.', ' ', '*', '\\'], '_', trim($key))] = $val;
-                }
-                $outRecord['labels'] = $outLabels;
-            }
-
             // Context should go to the top of the out record
-            // We don't use array_merge to preserve the order (for better human readability)
-            foreach ($inContext as $key => $val) {
-                $outRecord[$key] = $val;
+            foreach ($inContext as $contextKey => $contextVal) {
+                // label keys should be sanitized
+                if ($contextKey === 'labels') {
+                    $outLabels = [];
+                    foreach ($contextVal as $labelKey => $labelVal) {
+                        $outLabels[str_replace(['.', ' ', '*', '\\'], '_', trim($labelKey))] = $labelVal;
+                    }
+                    $outRecord['labels'] = $outLabels;
+                    continue;
+                }
+
+                $outRecord[$contextKey] = $contextVal;
             }
         }
 
