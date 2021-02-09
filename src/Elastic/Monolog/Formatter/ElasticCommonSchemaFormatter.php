@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace Elastic\Monolog\Formatter;
 
 use Monolog\Formatter\NormalizerFormatter;
+use Throwable;
+use Elastic\Types\Error as EcsError;
 
 /**
  * Serializes a log message to the Elastic Common Schema (ECS)
@@ -41,6 +43,24 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         $this->tags = $tags;
     }
 
+    /** @inheritDoc */
+    protected function normalize($data, int $depth = 0)
+    {
+        if ($depth > $this->maxNormalizeDepth) {
+            return parent::normalize($data, $depth);
+        }
+
+        if ($data instanceof Throwable) {
+            return EcsError::serialize($data);
+        }
+
+        if ($data instanceof EcsError) {
+            return $data->jsonSerialize();
+        }
+
+        return parent::normalize($data, $depth);
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -70,15 +90,6 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         $outRecord['log'] = [
             'logger' => $inRecord['channel'],
         ];
-
-        // Add Error Context
-        if (isset($inRecord['context']['error']['Elastic\Types\Error']) === true) {
-            $outRecord['error'] = $inRecord['context']['error']['Elastic\Types\Error']['error'];
-            $outRecord['log'] = array_merge($outRecord['log'], $inRecord['context']['error']['Elastic\Types\Error']['log']);
-
-            $inRecord['message'] ?? $outRecord['error']['message'];
-            unset($inRecord['context']['error']);
-        }
 
         // Add Tracing Context
         if (isset($inRecord['context']['tracing']['Elastic\Types\Tracing']) === true) {

@@ -17,6 +17,7 @@ use Elastic\Tests\BaseTestCase;
 use Elastic\Types\{Error, Service, Tracing, User};
 use Monolog\Logger;
 use Monolog\Processor\TagProcessor;
+use Throwable;
 
 /**
  * Test: ElasticCommonSchemaFormatter
@@ -197,23 +198,36 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     }
 
     /**
-     * @depends testFormat
-     *
-     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
-     * @covers  \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     * @return array<array<mixed>>
      */
-    public function testContextWithError()
+    public function dataProviderForTestContextWithError(): iterable
     {
-        $t = $this->generateException();
-        $error = new Error($t);
+        return [
+            [self::generateException(), false],
+            [self::generateException(), true],
+        ];
+    }
 
+    /**
+     * @depends      testFormat
+     *
+     * @dataProvider dataProviderForTestContextWithError
+     *
+     * @covers       \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
+     * @covers       \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::format
+     *
+     * @param Throwable $throwable
+     * @param bool      $shouldWrap
+     */
+    public function testContextWithError(Throwable $throwable, bool $shouldWrap): void
+    {
         $msg = [
             'level'      => Logger::ERROR,
             'level_name' => 'ERROR',
             'channel'    => 'ecs',
             'datetime'   => new DateTimeImmutable("@0"),
             'message'    => md5(uniqid()),
-            'context'    => ['error' => $error],
+            'context'    => ['error' => $shouldWrap ? new Error($throwable) : $throwable],
             'extra'      => [],
         ];
 
@@ -228,25 +242,15 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
         $this->assertArrayHasKey('code', $decoded['error']);
         $this->assertArrayHasKey('stack_trace', $decoded['error']);
 
-        $this->assertArrayHasKey('log', $decoded);
-        $this->assertArrayHasKey('origin', $decoded['log']);
-        $this->assertArrayHasKey('file', $decoded['log']['origin']);
-        $this->assertArrayHasKey('name', $decoded['log']['origin']['file']);
-        $this->assertArrayHasKey('line', $decoded['log']['origin']['file']);
-
         // Ensure Array merging is sound ..
         $this->assertArrayHasKey('log.level', $decoded);
         $this->assertArrayHasKey('logger', $decoded['log']);
 
         // Values Correct ?
-        $this->assertEquals('BaseTestCase.php', basename($decoded['log']['origin']['file']['name']));
-        $this->assertEquals(44, $decoded['log']['origin']['file']['line']);
-
         $this->assertEquals('InvalidArgumentException', $decoded['error']['type']);
-        $this->assertEquals($t->getMessage(), $decoded['error']['message']);
-        $this->assertEquals($t->getCode(), $decoded['error']['code']);
-        $this->assertIsArray($decoded['error']['stack_trace']);
-        $this->assertNotEmpty($decoded['error']['stack_trace']);
+        $this->assertEquals($throwable->getMessage(), $decoded['error']['message']);
+        $this->assertEquals($throwable->getCode(), $decoded['error']['code']);
+        $this->assertSame($throwable->__toString(), $decoded['error']['stack_trace']);
 
         // Throwable removed from Context/Labels ?
         $this->assertArrayNotHasKey('labels', $decoded);
