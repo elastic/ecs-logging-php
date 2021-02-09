@@ -8,25 +8,25 @@ declare(strict_types=1);
 
 namespace Elastic\Tests\Types;
 
-use \Elastic\Tests\BaseTestCase;
-use Elastic\Types\Error;
+use Elastic\Tests\BaseTestCase;
 use Elastic\Types\BaseType;
+use Elastic\Types\Error;
 
 /**
  * Test: Error (Type)
  *
  * @version v1.x
  *
- * @see Elastic\Types\Error
+ * @see     \Elastic\Types\Error
  *
- * @author Philip Krauss <philip.krauss@elastic.co>
+ * @author  Philip Krauss <philip.krauss@elastic.co>
  */
 class ErrorTest extends BaseTestCase
 {
 
     /**
-     * @covers Elastic\Types\Error::__construct
-     * @covers Elastic\Types\Error::jsonSerialize
+     * @covers \Elastic\Types\Error::__construct
+     * @covers \Elastic\Types\Error::jsonSerialize
      */
     public function testSerialization()
     {
@@ -39,26 +39,15 @@ class ErrorTest extends BaseTestCase
         $decoded = $error->toArray();
         $this->assertIsArray($decoded);
 
-        $this->assertArrayHasKey('error', $decoded);
-        $this->assertArrayHasKey('type', $decoded['error']);
-        $this->assertArrayHasKey('message', $decoded['error']);
-        $this->assertArrayHasKey('code', $decoded['error']);
-        $this->assertArrayHasKey('stack_trace', $decoded['error']);
-
-        $this->assertArrayHasKey('log', $decoded);
-        $this->assertArrayHasKey('origin', $decoded['log']);
-        $this->assertArrayHasKey('file', $decoded['log']['origin']);
-        $this->assertArrayHasKey('name', $decoded['log']['origin']['file']);
-        $this->assertArrayHasKey('line', $decoded['log']['origin']['file']);
+        $this->assertArrayHasKey('type', $decoded);
+        $this->assertArrayHasKey('message', $decoded);
+        $this->assertArrayHasKey('code', $decoded);
+        $this->assertArrayHasKey('stack_trace', $decoded);
 
         // Values Correct ?
-        $this->assertEquals('BaseTestCase.php', basename($decoded['log']['origin']['file']['name']));
-        $this->assertEquals(44, $decoded['log']['origin']['file']['line']);
-
-        $this->assertEquals('InvalidArgumentException', $decoded['error']['type']);
-        $this->assertEquals($t->getMessage(), $decoded['error']['message']);
-        $this->assertEquals($t->getCode(), $decoded['error']['code']);
-        $this->assertIsArray($decoded['error']['stack_trace']);
-        $this->assertNotEmpty($decoded['error']['stack_trace']);
+        $this->assertEquals('InvalidArgumentException', $decoded['type']);
+        $this->assertEquals($t->getMessage(), $decoded['message']);
+        $this->assertEquals($t->getCode(), $decoded['code']);
+        $this->assertSame($t->__toString(), $decoded['stack_trace']);
     }
 }

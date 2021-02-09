@@ -39,7 +39,7 @@ class BaseTestCase extends TestCase
     /**
      * @return InvalidArgumentException
      */
-    protected function generateException(): Throwable
+    protected static function generateException(): Throwable
     {
         return new InvalidArgumentException('This is a InvalidArgumentException', 42);
     }
