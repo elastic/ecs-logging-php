@@ -2,6 +2,14 @@ module.exports = {
     "username": "elastic",
     "repo": "ecs-logging-php",
     "dataSource": "prs",
+    "ignoreLabels": [
+      "breaking",
+      "bug",
+      "enhancement",
+      "feat",
+      "feature",
+      "fix",
+      "refactor"],
     "ignoreIssuesWith": [
       "automation",
       "ci",
