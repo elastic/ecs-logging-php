@@ -72,7 +72,7 @@ pipeline {
       }
       when {
         beforeAgent true
-        tag pattern: 'v\\d+.*', comparator: 'REGEXP'
+        tag pattern: '\\d+.*', comparator: 'REGEXP'
       }
       agent { label 'docker && ubuntu-18.04 && immutable' }
       environment {
