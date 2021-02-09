@@ -98,24 +98,8 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
             unset($inRecord['context']['user']);
         }
 
-        // Add ECS Labels
-        $inContext = $inRecord['context'];
-        if (!empty($inContext)) {
-            // Context should go to the top of the out record
-            foreach ($inContext as $contextKey => $contextVal) {
-                // label keys should be sanitized
-                if ($contextKey === 'labels') {
-                    $outLabels = [];
-                    foreach ($contextVal as $labelKey => $labelVal) {
-                        $outLabels[str_replace(['.', ' ', '*', '\\'], '_', trim($labelKey))] = $labelVal;
-                    }
-                    $outRecord['labels'] = $outLabels;
-                    continue;
-                }
-
-                $outRecord[$contextKey] = $contextVal;
-            }
-        }
+        self::formatContext($inRecord['extra'], /* ref */ $outRecord);
+        self::formatContext($inRecord['context'], /* ref */ $outRecord);
 
         // Add ECS Tags
         if (empty($this->tags) === false) {
@@ -123,5 +107,23 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         }
 
         return $this->toJson($outRecord) . "\n";
+    }
+
+    private static function formatContext(array $inContext, array &$outRecord): void
+    {
+        // Context should go to the top of the out record
+        foreach ($inContext as $contextKey => $contextVal) {
+            // label keys should be sanitized
+            if ($contextKey === 'labels') {
+                $outLabels = [];
+                foreach ($contextVal as $labelKey => $labelVal) {
+                    $outLabels[str_replace(['.', ' ', '*', '\\'], '_', trim($labelKey))] = $labelVal;
+                }
+                $outRecord['labels'] = $outLabels;
+                continue;
+            }
+
+            $outRecord[$contextKey] = $contextVal;
+        }
     }
 }
