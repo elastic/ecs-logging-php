@@ -22,23 +22,39 @@ class TestHelper
     public $loggerName = 'MyLogger';
 
     /** @var Closure|null */
-    public $adaptLogger = null;
+    public $adaptFormatter = null;
+
+    /** @var int */
+    public $expectedLogLevel;
+
+    /** @var string */
+    public $expectedMessage = 'My log message';
+
+    /** @var array */
+    public $expectedContext = [];
 
     /** @var array */
     public $expectedAdditionalTopLevelKeys = [];
 
-    public function run(int $logLevel, string $message, array $context = []): array
+    /** @var array */
+    public $expectedAdditionalLogKeys = [];
+
+    public function run(Closure $log): array
     {
+        $this->logOriginFunction = __METHOD__;
+
         $logger = new Logger($this->loggerName);
         $handler = new MockHandler();
-        $handler->setFormatter(new ElasticCommonSchemaFormatter());
-        $logger->pushHandler($handler);
-        if ($this->adaptLogger !== null) {
-            ($this->adaptLogger)($logger);
+
+        $formatter = new ElasticCommonSchemaFormatter();
+        if ($this->adaptFormatter !== null) {
+            ($this->adaptFormatter)($formatter);
         }
+        $handler->setFormatter($formatter);
+        $logger->pushHandler($handler);
 
         $timeBefore = new DateTimeImmutable();
-        $logger->addRecord($logLevel, $message, $context);
+        $log($logger);
         $timeAfter = new DateTimeImmutable();
 
         TestCase::assertCount(1, $handler->records);
@@ -57,16 +73,17 @@ class TestHelper
         TestCase::assertGreaterThanOrEqual($timeBefore, $timestamp);
         TestCase::assertLessThanOrEqual($timeAfter, $timestamp);
 
-        TestCase::assertEquals(Logger::getLevelName($logLevel), $decodedJson['log.level']);
+        TestCase::assertEquals(Logger::getLevelName($this->expectedLogLevel), $decodedJson['log.level']);
 
         TestCase::assertEquals(ElasticCommonSchemaFormatterTest::ECS_VERSION, $decodedJson['ecs.version']);
 
-        TestCase::assertEquals($message, $decodedJson['message']);
+        TestCase::assertEquals($this->expectedMessage, $decodedJson['message']);
 
-        TestCase::assertEquals(['logger'], array_keys($decodedJson['log']));
+        $expectedLogKeys = array_merge(['logger'], $this->expectedAdditionalLogKeys);
+        TestCase::assertEquals($expectedLogKeys, array_keys($decodedJson['log']));
         TestCase::assertSame($this->loggerName, $decodedJson['log']['logger']);
 
-        foreach ($context as $ctxKey => $ctxVal) {
+        foreach ($this->expectedContext as $ctxKey => $ctxVal) {
             TestCase::assertArrayHasKey($ctxKey, $decodedJson[0]);
         }
 

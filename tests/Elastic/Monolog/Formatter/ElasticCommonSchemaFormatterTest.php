@@ -14,8 +14,10 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter;
 use Elastic\Tests\BaseTestCase;
+use Elastic\Tests\HelperForMonolog;
 use Elastic\Types\{Error, Service, Tracing, User};
 use Monolog\Logger;
+use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\TagProcessor;
 use Throwable;
 
@@ -367,12 +369,15 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     public function testTagProcessor()
     {
         $testHelper = new TestHelper();
-        $testHelper->adaptLogger = function (Logger $logger) {
-            $logger->pushProcessor(new TagProcessor(['tag_key' => 'tag_val', 'tag_val_without_key']));
-        };
         $testHelper->expectedAdditionalTopLevelKeys = ['tags'];
+        $testHelper->expectedLogLevel = Logger::ALERT;
 
-        $decodedJson = $testHelper->run(Logger::ALERT, 'My log message');
+        $decodedJson = $testHelper->run(
+            function (Logger $logger) use ($testHelper) {
+                $logger->pushProcessor(new TagProcessor(['tag_key' => 'tag_val', 'tag_val_without_key']));
+                $logger->alert($testHelper->expectedMessage);
+            }
+        );
 
         $tags = $decodedJson['tags'];
         self::assertCount(2, $tags);
@@ -383,18 +388,70 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     public function testServiceNamePerLogger()
     {
         $testHelper = new TestHelper();
-        $testHelper->adaptLogger = function (Logger $logger) {
-            $logger->pushProcessor(
-                function ($record) {
-                    $record['extra']['service.name'] = 'my_service';
-                    return $record;
-                }
-            );
-        };
         $testHelper->expectedAdditionalTopLevelKeys = ['service.name'];
+        $testHelper->expectedLogLevel = Logger::WARNING;
 
-        $decodedJson = $testHelper->run(Logger::ALERT, 'My log message');
+        $decodedJson = $testHelper->run(
+            function (Logger $logger) use ($testHelper) {
+                $logger->pushProcessor(
+                    function ($record) {
+                        $record['extra']['service.name'] = 'my_service';
+                        return $record;
+                    }
+                );
+                $logger->warning($testHelper->expectedMessage);
+            }
+        );
 
         self::assertSame('my_service', $decodedJson['service.name']);
+    }
+
+    /**
+     * @return array<array<bool>>
+     */
+    public function dataProviderForTestsIntrospectionProcessor(): iterable
+    {
+        return [[false], [true]];
+    }
+
+    /**
+     * @dataProvider dataProviderForTestsIntrospectionProcessor
+     *
+     * @param bool $useLogOriginFromContext
+     */
+    public function testsIntrospectionProcessor(bool $useLogOriginFromContext)
+    {
+        $testHelper = new TestHelper();
+        if (!$useLogOriginFromContext) {
+            $testHelper->adaptFormatter = function (ElasticCommonSchemaFormatter $formatter) {
+                $formatter->useLogOriginFromContext(false);
+            };
+        }
+        $testHelper->expectedLogLevel = Logger::EMERGENCY;
+
+        if ($useLogOriginFromContext) {
+            $testHelper->expectedAdditionalLogKeys = ['origin'];
+        } else {
+            $testHelper->expectedAdditionalTopLevelKeys = ['file', 'line', 'class', 'function'];
+        }
+
+        $logOrigin = [];
+        $decodedJson = $testHelper->run(
+            function (Logger $logger) use ($testHelper, &$logOrigin) {
+                $logger->pushProcessor(new IntrospectionProcessor());
+                // Unfortunately IntrospectionProcessor removes all the stack frames with 'Monolog\' in the namespace
+                // even if 'Monolog\' is in the middle of the namespace
+                // so we use a helper class without 'Monolog\' in its namespace to work around that limitation
+                HelperForMonolog::logEmergency($logger, $testHelper->expectedMessage, /* ref */ $logOrigin);
+            }
+        );
+
+        if ($useLogOriginFromContext) {
+            self::assertSame($logOrigin['file'], $decodedJson['log']['origin']['file']['name']);
+            self::assertSame($logOrigin['line'], $decodedJson['log']['origin']['file']['line']);
+            self::assertSame($logOrigin['class'] . '::' . $logOrigin['function'], $decodedJson['log']['origin']['function']);
+        } else {
+            self::assertArrayNotHasKey('origin', $decodedJson['log']);
+        }
     }
 }

@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Elastic\Monolog\Formatter;
 
+use Elastic\Types\Error as EcsError;
 use Monolog\Formatter\NormalizerFormatter;
 use Throwable;
-use Elastic\Types\Error as EcsError;
 
 /**
  * Serializes a log message to the Elastic Common Schema (ECS)
@@ -27,12 +27,17 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
 {
     private const ECS_VERSION = '1.2.0';
 
+    private static $logOriginKeys = ['file' => true, 'line' => true, 'class' => true, 'function' => true];
+
     /**
      * @var array
      *
      * @link https://www.elastic.co/guide/en/ecs/current/ecs-base.html
      */
     protected $tags;
+
+    /** @var bool */
+    protected $useLogOriginFromContext = true;
 
     /**
      * @param array $tags optional tags to enrich the log lines
@@ -41,6 +46,12 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
     {
         parent::__construct('Y-m-d\TH:i:s.uP');
         $this->tags = $tags;
+    }
+
+    public function useLogOriginFromContext(bool $useLogOriginFromContext): self
+    {
+        $this->useLogOriginFromContext = $useLogOriginFromContext;
+        return $this;
     }
 
     /** @inheritDoc */
@@ -109,8 +120,8 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
             unset($inRecord['context']['user']);
         }
 
-        self::formatContext($inRecord['extra'], /* ref */ $outRecord);
-        self::formatContext($inRecord['context'], /* ref */ $outRecord);
+        $this->formatContext($inRecord['extra'], /* ref */ $outRecord);
+        $this->formatContext($inRecord['context'], /* ref */ $outRecord);
 
         // Add ECS Tags
         if (empty($this->tags) === false) {
@@ -120,8 +131,10 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         return $this->toJson($outRecord) . "\n";
     }
 
-    private static function formatContext(array $inContext, array &$outRecord): void
+    private function formatContext(array $inContext, array &$outRecord): void
     {
+        $foundLogOriginKeys = false;
+
         // Context should go to the top of the out record
         foreach ($inContext as $contextKey => $contextVal) {
             // label keys should be sanitized
@@ -134,7 +147,64 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
                 continue;
             }
 
+            if ($this->useLogOriginFromContext) {
+                if (isset(self::$logOriginKeys[$contextKey])) {
+                    $foundLogOriginKeys = true;
+                    continue;
+                }
+            }
+
             $outRecord[$contextKey] = $contextVal;
+        }
+
+        if ($foundLogOriginKeys) {
+            $this->formatLogOrigin($inContext, /* ref */ $outRecord);
+        }
+    }
+
+    private function formatLogOrigin(array $inContext, array &$outRecord): void
+    {
+        $originVal = [];
+
+        $fileVal = [];
+        if (array_key_exists('file', $inContext)) {
+            $fileName = $inContext['file'];
+            if (is_string($fileName)) {
+                $fileVal['name'] = $fileName;
+            }
+        }
+        if (array_key_exists('line', $inContext)) {
+            $fileLine = $inContext['line'];
+            if (is_int($fileLine)) {
+                $fileVal['line'] = $fileLine;
+            }
+        }
+        if (!empty($fileVal)) {
+            $originVal['file'] = $fileVal;
+        }
+
+        $outFunctionVal = null;
+        if (array_key_exists('function', $inContext)) {
+            $inFunctionVal = $inContext['function'];
+            if (is_string($inFunctionVal)) {
+                if (array_key_exists('class', $inContext)) {
+                    $inClassVal = $inContext['class'];
+                    if (is_string($inClassVal)) {
+                        $outFunctionVal = $inClassVal . '::' . $inFunctionVal;
+                    }
+                }
+
+                if ($outFunctionVal === null) {
+                    $outFunctionVal = $inFunctionVal;
+                }
+            }
+        }
+        if ($outFunctionVal !== null) {
+            $originVal['function'] = $outFunctionVal;
+        }
+
+        if (!empty($originVal)) {
+            $outRecord['log']['origin'] = $originVal;
         }
     }
 }
