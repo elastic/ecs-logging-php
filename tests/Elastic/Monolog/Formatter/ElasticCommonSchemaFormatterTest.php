@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpUnhandledExceptionInspection */
+
 declare(strict_types=1);
 
 // Licensed to Elasticsearch B.V under one or more agreements.
@@ -9,6 +11,7 @@ declare(strict_types=1);
 namespace Elastic\Tests\Monolog\Formatter;
 
 use DateTimeImmutable;
+use DateTimeZone;
 use Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter;
 use Elastic\Tests\BaseTestCase;
 use Elastic\Types\{Error, Service, Tracing, User};
@@ -68,6 +71,28 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
         $this->assertEquals($msg['message'], $decoded['message']);
         $this->assertEquals(self::ECS_VERSION, $decoded['ecs.version']);
         $this->assertEquals($msg['channel'], $decoded['log']['logger']);
+    }
+
+    public function testTimezone()
+    {
+        $msg = [
+            'level'      => Logger::INFO,
+            'level_name' => 'INFO',
+            'channel'    => 'ecs',
+            'datetime'   => new DateTimeImmutable('2013-11-28T12:34:56.98765', new DateTimeZone('-03:45')),
+            'message'    => md5(uniqid()),
+            'context'    => [],
+            'extra'      => [],
+        ];
+
+        $formatter = new ElasticCommonSchemaFormatter();
+        $doc = $formatter->format($msg);
+
+        // Comply to the ECS format
+        $decoded = json_decode($doc, true);
+        $this->assertIsArray($decoded);
+        $this->assertArrayHasKey('@timestamp', $decoded);
+        $this->assertEquals('2013-11-28T12:34:56.987650-03:45', $decoded['@timestamp']);
     }
 
     /**

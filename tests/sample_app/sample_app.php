@@ -9,6 +9,12 @@ use Elastic\Types\Error as EcsError;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
+echo 'Current timezone: ' . date_default_timezone_get() . PHP_EOL;
+if (date_default_timezone_set('America/New_York') !== true) {
+    die('Failed to set timezone');
+}
+echo 'Current timezone: ' . date_default_timezone_get() . PHP_EOL;
+
 $log = new Logger('MyLogger');
 $handler = new StreamHandler('php://stdout', Logger::DEBUG);
 $handler->setFormatter(new ElasticCommonSchemaFormatter());
