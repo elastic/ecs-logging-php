@@ -16,6 +16,7 @@ use Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter;
 use Elastic\Tests\BaseTestCase;
 use Elastic\Types\{Error, Service, Tracing, User};
 use Monolog\Logger;
+use Monolog\Processor\TagProcessor;
 
 /**
  * Test: ElasticCommonSchemaFormatter
@@ -27,7 +28,7 @@ use Monolog\Logger;
  */
 class ElasticCommonSchemaFormatterTest extends BaseTestCase
 {
-    private const ECS_VERSION = '1.2.0';
+    public const ECS_VERSION = '1.2.0';
 
     /**
      * @covers \Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter::__construct
@@ -288,13 +289,15 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
             return true;
         }
 
-        return substr_compare(
+        $substrCompareRetVal = substr_compare(
             $text /* <- haystack */,
             $prefix /* <- needle */,
             0 /* <- offset */,
             $prefixLen /* <- length */,
             !$isCaseSensitive /* <- case_insensitivity */
-        ) === 0;
+        );
+
+        return $substrCompareRetVal === 0;
     }
 
     /**
@@ -355,5 +358,39 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
             ++$topLevelFoundCount;
         }
         $this->assertSame(count($inLabels), $topLevelFoundCount);
+    }
+
+    public function testTagProcessor()
+    {
+        $testHelper = new TestHelper();
+        $testHelper->adaptLogger = function (Logger $logger) {
+            $logger->pushProcessor(new TagProcessor(['tag_key' => 'tag_val', 'tag_val_without_key']));
+        };
+        $testHelper->expectedAdditionalTopLevelKeys = ['tags'];
+
+        $decodedJson = $testHelper->run(Logger::ALERT, 'My log message');
+
+        $tags = $decodedJson['tags'];
+        self::assertCount(2, $tags);
+        self::assertSame('tag_val', $tags['tag_key']);
+        self::assertSame('tag_val_without_key', $tags[0]);
+    }
+
+    public function testServiceNamePerLogger()
+    {
+        $testHelper = new TestHelper();
+        $testHelper->adaptLogger = function (Logger $logger) {
+            $logger->pushProcessor(
+                function ($record) {
+                    $record['extra']['service.name'] = 'my_service';
+                    return $record;
+                }
+            );
+        };
+        $testHelper->expectedAdditionalTopLevelKeys = ['service.name'];
+
+        $decodedJson = $testHelper->run(Logger::ALERT, 'My log message');
+
+        self::assertSame('my_service', $decodedJson['service.name']);
     }
 }
