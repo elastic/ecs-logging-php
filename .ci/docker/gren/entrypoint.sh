@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
-set -exo pipefail
+set -eo pipefail
 
-/usr/local/bin/gren release \
+TYPE=${1:-release}
+
+if [ "${TYPE}" == "release" ] ; then
+    /usr/local/bin/gren release \
         --token="${GITHUB_TOKEN}" \
         --tags="${TAG_NAME}" \
         --config .ci/.grenrc.js
+else
+    /usr/local/bin/gren changelog \
+        --generate \
+        --override \
+        --token="${GITHUB_TOKEN}" \
+        --tags="${TAG_NAME}" \
+        --config .ci/.grenrc.js
+fi
