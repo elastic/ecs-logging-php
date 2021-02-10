@@ -25,6 +25,16 @@ pipeline {
     issueCommentTrigger('(?i).*jenkins\\W+run\\W+(?:the\\W+)?tests(?:\\W+please)?.*')
   }
   stages {
+    stage('Notify') {
+      options { skipDefaultCheckout() }
+      when {
+        tag pattern: '\\d+.*', comparator: 'REGEXP'
+      }
+      steps {
+        notifyStatus(slackStatus: 'warning', subject: "[${env.REPO}] Release *${env.TAG_NAME}* build just started",
+                     body: "Build: (<${env.RUN_DISPLAY_URL}|here>)")
+      }
+    }
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
@@ -66,10 +76,7 @@ pipeline {
       }
     }
     stage('Release') {
-      options {
-        skipDefaultCheckout()
-        timeout(time: 12, unit: 'HOURS')
-      }
+      options { skipDefaultCheckout() }
       when {
         beforeAgent true
         tag pattern: '\\d+.*', comparator: 'REGEXP'
@@ -78,24 +85,12 @@ pipeline {
       environment {
         RELEASE_URL_MESSAGE = "(<https://github.com/elastic/${env.REPO}/releases/tag/${env.TAG_NAME}|${env.TAG_NAME}>)"
       }
-      stages {
-        stage('Notify') {
-          options { skipDefaultCheckout() }
-          steps {
-            notifyStatus(slackStatus: 'warning', subject: "[${env.REPO}] Release ready to be pushed",
-                         body: "Please (<${env.BUILD_URL}input|approve>) it or reject within 12 hours.\n Changes: ${env.TAG_NAME}")
-          }
-        }
-        stage('Release CI') {
-          options { skipDefaultCheckout() }
-          steps {
-            deleteDir()
-            unstash 'source'
-            dir("${BASE_DIR}") {
-              withCredentials([string(credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7', variable: 'GITHUB_TOKEN')]) {
-                sh(script: 'make -f .ci/Makefile release', label: 'release')
-              }
-            }
+      steps {
+        deleteDir()
+        unstash 'source'
+        dir("${BASE_DIR}") {
+          withCredentials([string(credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7', variable: 'GITHUB_TOKEN')]) {
+            sh(script: 'make -f .ci/Makefile release', label: 'release')
           }
         }
       }
