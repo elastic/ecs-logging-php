@@ -10,10 +10,6 @@ See the [PHP ECS logging documentation](https://www.elastic.co/guide/en/ecs-logg
 
 ---
 
-**Please note** that this library is in a **beta** version and backwards-incompatible changes might be introduced in future releases. While we strive to comply to [semver](https://semver.org/), we can not guarantee to avoid breaking changes in minor releases.
-
----
-
 ## Install
 ```
 composer require elastic/ecs-logging
