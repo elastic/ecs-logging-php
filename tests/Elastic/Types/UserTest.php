@@ -107,7 +107,7 @@ class UserTest extends BaseTestCase
      */
     public function testSeralizeFullName()
     {
-        $expected = sprintf("Max Mustermann the %ith", rand(4, 9));
+        $expected = sprintf("Max Mustermann the %dth", rand(4, 9));
 
         $user = new User();
         $user->setFullName($expected);
