@@ -125,6 +125,13 @@ class Service extends BaseType implements JsonSerializable
      */
     public function jsonSerialize()
     {
+        if (array_key_exists('name', $this->data) && ($this->data['name'] != '')) {
+            return [
+                'service' => $this->data,
+                'event' => ['dataset' => $this->data['name'] . '.log']
+            ];
+        }
+
         return ['service' => $this->data];
     }
 }
