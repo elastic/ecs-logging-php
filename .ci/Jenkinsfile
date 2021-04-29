@@ -54,26 +54,26 @@ pipeline {
         }
       }
     }
-    stage('Parallel'){
+    stage('Test'){
       parallel {
-        stage('Test-7.2') {
+        stage('on PHP 7.2') {
           steps {
             buildWithGitHubNotification('7.2-alpine')
           }
         }
-        stage('Test-7.3') {
+        stage('on PHP 7.3') {
           agent { label 'linux && immutable' }
           steps {
             buildWithGitHubNotification('7.3-alpine')
           }
         }
-        stage('Test-7.4') {
+        stage('on PHP 7.4') {
           agent { label 'linux && immutable' }
           steps {
             buildWithGitHubNotification('7.4-alpine')
           }
         }
-        stage('Test-8.0') {
+        stage('on PHP 8.0') {
           agent { label 'linux && immutable' }
           steps {
             buildWithGitHubNotification('8.0-alpine')
