@@ -67,10 +67,16 @@ pipeline {
             buildWithGitHubNotification('7.3-alpine')
           }
         }
-        stage('Test-7') {
+        stage('Test-7.4') {
           agent { label 'linux && immutable' }
           steps {
             buildWithGitHubNotification('7.4-alpine')
+          }
+        }
+        stage('Test-8.0') {
+          agent { label 'linux && immutable' }
+          steps {
+            buildWithGitHubNotification('8.0-alpine')
           }
         }
       }
