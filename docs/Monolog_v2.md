@@ -30,7 +30,7 @@ catch(\Exception $exception) {
     // log and do other things ..
 }
 ```
-ECS [docs](https://www.elastic.co/guide/en/ecs/current/ecs-error.html) | Service [class](https://github.com/elastic/ecs-logging-php/blob/master/src/Elastic/Types/Error.php)
+ECS [docs](https://www.elastic.co/guide/en/ecs/current/ecs-error.html) | Service [class](https://github.com/elastic/ecs-logging-php/blob/main/src/Elastic/Types/Error.php)
 
 ### Service
 The service context enables you to provide more attributes describing your service. Setting a version can help you track system behaviour over time.
@@ -43,7 +43,7 @@ $serviceContext->setVersion('1.2.42');
 
 $logger->notice('this message adds service context, nice :)', ['service' => $serviceContext]);
 ```
-ECS [docs](https://www.elastic.co/guide/en/ecs/current/ecs-service.html) | Service [class](https://github.com/elastic/ecs-logging-php/blob/master/src/Elastic/Types/Service.php)
+ECS [docs](https://www.elastic.co/guide/en/ecs/current/ecs-service.html) | Service [class](https://github.com/elastic/ecs-logging-php/blob/main/src/Elastic/Types/Service.php)
 
 ### User
 The user context allows you to enrich your log entries with user specific attributes such as `user.id` or `user.name` to simplify the discovery of specific log events.
@@ -56,7 +56,7 @@ $userContext->setEmail('hello@example.com');
 
 $logger->notice('heya, the context helps you to trace logs more effective', ['user' => $userContext]);
 ```
-ECS [docs](https://www.elastic.co/guide/en/ecs/current/ecs-user.html) | Service [class](https://github.com/elastic/ecs-logging-php/blob/master/src/Elastic/Types/User.php)
+ECS [docs](https://www.elastic.co/guide/en/ecs/current/ecs-user.html) | Service [class](https://github.com/elastic/ecs-logging-php/blob/main/src/Elastic/Types/User.php)
 
 Please be aware that a method `User::setHash` is available, if you want to obfuscate `user.id`, `user.name`, etc.
 
@@ -69,4 +69,4 @@ $tracingContext = new Tracing('<trace-id>', '<transaction-id>');
 
 $logger->notice('I am a log message with a trace id, so you can do awesome things in the Logs UI', ['tracing' => $tracingContext]);
 ```
-ECS [docs](https://www.elastic.co/guide/en/ecs/current/ecs-tracing.html) | Tracing [class](https://github.com/elastic/ecs-logging-php/blob/master/src/Elastic/Types/Tracing.php)
+ECS [docs](https://www.elastic.co/guide/en/ecs/current/ecs-tracing.html) | Tracing [class](https://github.com/elastic/ecs-logging-php/blob/main/src/Elastic/Types/Tracing.php)
