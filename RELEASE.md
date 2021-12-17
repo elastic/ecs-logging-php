@@ -2,7 +2,7 @@
 
 ## CI based
 
-The release process is also automated in the way any specific commit, from the master branch ideally, can be potentially released, for such it's required the below steps:
+The release process is also automated in the way any specific commit, from the main branch ideally, can be potentially released, for such it's required the below steps:
 
 1. Checkout the commit to be released
 1. Create a tag with the format `[0-9]+.[0-9]+.[0-9]+`, i.e.: `1.0.2`

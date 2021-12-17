@@ -1,4 +1,4 @@
-[![Build Status](https://apm-ci.elastic.co/buildStatus/icon?job=apm-agent-php%2Fecs-logging-php-mbp%2Fmaster)](https://apm-ci.elastic.co/job/apm-agent-php/job/ecs-logging-php-mbp/job/master/)
+[![Build Status](https://apm-ci.elastic.co/buildStatus/icon?job=apm-agent-php%2Fecs-logging-php-mbp%2Fmain)](https://apm-ci.elastic.co/job/apm-agent-php/job/ecs-logging-php-mbp/job/main/)
 
 # ECS Logging for PHP
 
@@ -16,7 +16,7 @@ composer require elastic/ecs-logging
 ```
 
 ## Examples and Usage
-* [Monolog v2.0](https://github.com/elastic/ecs-logging-php/blob/master/docs/Monolog_v2.md)
+* [Monolog v2.0](https://github.com/elastic/ecs-logging-php/blob/main/docs/Monolog_v2.md)
 
 ## Library Support
 * Currently only [Monolog:2.*](https://github.com/Seldaek/monolog) is supported.
@@ -32,4 +32,4 @@ composer require elastic/ecs-logging
 See [contributing documentation](CONTRIBUTING.md).
 
 ## License
-This software is licensed under the [Apache 2 license](https://github.com/elastic/ecs-logging-php/blob/master/LICENSE).
+This software is licensed under the [Apache 2 license](https://github.com/elastic/ecs-logging-php/blob/main/LICENSE).
