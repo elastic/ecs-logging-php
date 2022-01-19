@@ -23,7 +23,6 @@ use Elastic\Types\Error;
  */
 class ErrorTest extends BaseTestCase
 {
-
     /**
      * @covers \Elastic\Types\Error::__construct
      * @covers \Elastic\Types\Error::jsonSerialize

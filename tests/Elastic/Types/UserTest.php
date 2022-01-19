@@ -23,7 +23,6 @@ use Elastic\Types\BaseType;
  */
 class UserTest extends BaseTestCase
 {
-
     /**
      * @covers Elastic\Types\User::__construct
      * @covers Elastic\Types\User::jsonSerialize

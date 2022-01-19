@@ -23,7 +23,6 @@ use Elastic\Types\BaseType;
  */
 class ServiceTest extends BaseTestCase
 {
-
     /**
      * @covers Elastic\Types\Service::__construct
      * @covers Elastic\Types\Service::jsonSerialize

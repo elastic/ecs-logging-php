@@ -22,7 +22,6 @@ use JsonSerializable;
  */
 class Tracing extends BaseType implements JsonSerializable
 {
-
     /**
      * Unique identifier of the trace
      *
