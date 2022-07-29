@@ -27,7 +27,7 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
 {
     private const ECS_VERSION = '1.2.0';
 
-    private static $logOriginKeys = ['file' => true, 'line' => true, 'class' => true, 'function' => true];
+    private static $logOriginKeys = ['file' => true, 'line' => true, 'class' => true, 'function' => true, 'callType' => true];
 
     /**
      * @var array
@@ -181,6 +181,13 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         }
         if (!empty($fileVal)) {
             $originVal['file'] = $fileVal;
+        }
+
+        if (array_key_exists('callType', $inContext)) {
+            $callType = $inContext['callType'];
+            if (is_string($callType)) {
+                $originVal['callType'] = $callType;
+            }
         }
 
         $outFunctionVal = null;

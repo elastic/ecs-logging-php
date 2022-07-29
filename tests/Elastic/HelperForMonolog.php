@@ -14,6 +14,7 @@ class HelperForMonolog
 {
     public static function logEmergency(Logger $logger, string $message, array &$logOrigin): void
     {
+        $logOrigin['callType'] = '::';
         $logOrigin['class'] = __CLASS__;
         $logOrigin['function'] = __FUNCTION__;
         $logOrigin['file'] = __FILE__;

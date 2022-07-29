@@ -23,7 +23,6 @@ use Elastic\Types\BaseType;
  */
 class TracingTest extends BaseTestCase
 {
-
     /**
      * @covers Elastic\Types\Tracing::__construct
      * @covers Elastic\Types\Tracing::jsonSerialize

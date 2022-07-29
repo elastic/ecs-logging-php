@@ -21,7 +21,6 @@ use JsonSerializable;
  */
 class Service extends BaseType implements JsonSerializable
 {
-
     /**
      * @var array
      */
