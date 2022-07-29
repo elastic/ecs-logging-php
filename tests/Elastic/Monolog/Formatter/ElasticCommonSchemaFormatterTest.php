@@ -450,7 +450,6 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
             self::assertSame($logOrigin['file'], $decodedJson['log']['origin']['file']['name']);
             self::assertSame($logOrigin['line'], $decodedJson['log']['origin']['file']['line']);
             self::assertSame($logOrigin['class'] . '::' . $logOrigin['function'], $decodedJson['log']['origin']['function']);
-            self::assertSame($logOrigin['callType'], $decodedJson['log']['origin']['callType']);
         } else {
             self::assertArrayNotHasKey('origin', $decodedJson['log']);
         }

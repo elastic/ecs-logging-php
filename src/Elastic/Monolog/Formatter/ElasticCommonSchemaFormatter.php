@@ -183,13 +183,6 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
             $originVal['file'] = $fileVal;
         }
 
-        if (array_key_exists('callType', $inContext)) {
-            $callType = $inContext['callType'];
-            if (is_string($callType)) {
-                $originVal['callType'] = $callType;
-            }
-        }
-
         $outFunctionVal = null;
         if (array_key_exists('function', $inContext)) {
             $inFunctionVal = $inContext['function'];
@@ -197,7 +190,10 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
                 if (array_key_exists('class', $inContext)) {
                     $inClassVal = $inContext['class'];
                     if (is_string($inClassVal)) {
-                        $outFunctionVal = $inClassVal . '::' . $inFunctionVal;
+                        $callType = array_key_exists('callType', $inContext) && is_string($inContext['callType'])
+                            ? $inContext['callType']
+                            : '::';
+                        $outFunctionVal = $inClassVal . $callType . $inFunctionVal;
                     }
                 }
 
