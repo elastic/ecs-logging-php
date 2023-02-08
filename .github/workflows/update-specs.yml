@@ -1,5 +1,5 @@
 ---
-# Send PRs to the subscribed ECS Agents if the spec files (JSON) are modified
+# Open a PR if the shared spec files are modified
 name: update-specs
 
 on:
