@@ -55,3 +55,4 @@ targets:
     scmid: githubConfig
     spec:
       file: tests/shared/spec/spec.json
+      forcecreate: true

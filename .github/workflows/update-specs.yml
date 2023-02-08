@@ -27,4 +27,4 @@ jobs:
       - name: Run Updatecli
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: updatecli apply --config ./.github/update-specs.yml
+        run: updatecli apply --config ./.ci/update-specs.yml
