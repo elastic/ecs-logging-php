@@ -432,7 +432,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
         if ($useLogOriginFromContext) {
             $testHelper->expectedAdditionalLogKeys = ['origin'];
         } else {
-            $testHelper->expectedAdditionalTopLevelKeys = ['file', 'line', 'class', 'function'];
+            $testHelper->expectedAdditionalTopLevelKeys = ['file', 'line', 'class', 'callType', 'function'];
         }
 
         $logOrigin = [];
@@ -449,7 +449,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
         if ($useLogOriginFromContext) {
             self::assertSame($logOrigin['file'], $decodedJson['log']['origin']['file']['name']);
             self::assertSame($logOrigin['line'], $decodedJson['log']['origin']['file']['line']);
-            self::assertSame($logOrigin['class'] . '::' . $logOrigin['function'], $decodedJson['log']['origin']['function']);
+            self::assertSame($logOrigin['class'] . $logOrigin['callType'] . $logOrigin['function'], $decodedJson['log']['origin']['function']);
         } else {
             self::assertArrayNotHasKey('origin', $decodedJson['log']);
         }
