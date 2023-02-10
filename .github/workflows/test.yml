@@ -40,4 +40,7 @@ jobs:
         env:
           VERSION: ${{ matrix.php-image }}
         run: composer test
-
+      - uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: junit-*.xml
