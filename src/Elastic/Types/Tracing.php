@@ -16,13 +16,12 @@ use JsonSerializable;
  * @version v1.x
  *
  * @see https://www.elastic.co/guide/en/ecs/current/ecs-tracing.html
- * @see Elastic\Types\TracingTest
+ * @see \Elastic\Types\TracingTest
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
  */
 class Tracing extends BaseType implements JsonSerializable
 {
-
     /**
      * Unique identifier of the trace
      *
@@ -48,14 +47,19 @@ class Tracing extends BaseType implements JsonSerializable
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
+     *
+     * @noinspection PhpFullyQualifiedNameUsageInspection
+     * @noinspection PhpLanguageLevelInspection
      */
-    public function jsonSerialize()
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize(): array
     {
-        $message['trace'] = ['id' => $this->traceId];
+        $result = [];
+        $result['trace'] = ['id' => $this->traceId];
         if ($this->transactionId !== null) {
-            $message['transaction'] = ['id' => $this->transactionId];
+            $result['transaction'] = ['id' => $this->transactionId];
         }
-        return $message;
+        return $result;
     }
 }

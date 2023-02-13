@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Elastic\Tests\Types;
 
-use \Elastic\Tests\BaseTestCase;
+use Elastic\Tests\BaseTestCase;
 use Elastic\Types\Tracing;
 use Elastic\Types\BaseType;
 
@@ -17,16 +17,15 @@ use Elastic\Types\BaseType;
  *
  * @version v1.x
  *
- * @see Elastic\Types\Tracing
+ * @see \Elastic\Types\Tracing
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
  */
 class TracingTest extends BaseTestCase
 {
-
     /**
-     * @covers Elastic\Types\Tracing::__construct
-     * @covers Elastic\Types\Tracing::jsonSerialize
+     * @covers \Elastic\Types\Tracing::__construct
+     * @covers \Elastic\Types\Tracing::jsonSerialize
      */
     public function testSerialization()
     {
@@ -54,8 +53,8 @@ class TracingTest extends BaseTestCase
     /**
      * @depends testSerialization
      *
-     * @covers Elastic\Types\Tracing::__construct
-     * @covers Elastic\Types\Tracing::jsonSerialize
+     * @covers \Elastic\Types\Tracing::__construct
+     * @covers \Elastic\Types\Tracing::jsonSerialize
      */
     public function testMvpWithoutTransactionId()
     {

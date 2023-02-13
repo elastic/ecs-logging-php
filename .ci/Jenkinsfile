@@ -79,6 +79,18 @@ pipeline {
             buildWithGitHubNotification('8.0-alpine')
           }
         }
+        stage('on PHP 8.1') {
+          agent { label 'linux && immutable' }
+          steps {
+            buildWithGitHubNotification('8.1-alpine')
+          }
+        }
+        stage('on PHP 8.2') {
+          agent { label 'linux && immutable' }
+          steps {
+            buildWithGitHubNotification('8.2-alpine')
+          }
+        }
       }
     }
     stage('Release') {

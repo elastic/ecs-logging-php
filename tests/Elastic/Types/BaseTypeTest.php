@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Elastic\Tests\Types;
 
-use \Elastic\Tests\BaseTestCase;
+use Elastic\Tests\BaseTestCase;
 use Elastic\Types\Tracing;
 use Elastic\Types\BaseType;
 
@@ -17,15 +17,14 @@ use Elastic\Types\BaseType;
  *
  * @version v1.x
  *
- * @see Elastic\Types\BaseType
+ * @see \Elastic\Types\BaseType
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
  */
 class BaseTypeTest extends BaseTestCase
 {
-
     /**
-     * @covers Elastic\Types\BaseType::toArray
+     * @covers \Elastic\Types\BaseType::toArray
      */
     public function testToArray()
     {
@@ -39,7 +38,7 @@ class BaseTypeTest extends BaseTestCase
     }
 
     /**
-     * @covers Elastic\Types\BaseType::__toString
+     * @covers \Elastic\Types\BaseType::__toString
      */
     public function testToString()
     {

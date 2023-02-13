@@ -154,6 +154,15 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
                 }
             }
 
+            /**
+             * Skip 'callType' key. The value is the same as 'type' in the frame returned by debug_backtrace().
+             *
+             * @See https://www.php.net/manual/en/function.debug-backtrace.php
+             */
+            if ($contextKey === 'callType') {
+                continue;
+            }
+
             $outRecord[$contextKey] = $contextVal;
         }
 

@@ -21,7 +21,6 @@ use JsonSerializable;
  */
 class User extends BaseType implements JsonSerializable
 {
-
     /**
      * @var array
      */
@@ -94,9 +93,13 @@ class User extends BaseType implements JsonSerializable
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
+     *
+     * @noinspection PhpFullyQualifiedNameUsageInspection
+     * @noinspection PhpLanguageLevelInspection
      */
-    public function jsonSerialize()
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize(): array
     {
         return ['user' => $this->data];
     }

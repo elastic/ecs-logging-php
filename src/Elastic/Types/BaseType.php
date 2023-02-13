@@ -10,7 +10,6 @@ namespace Elastic\Types;
 
 class BaseType
 {
-
     /**
      * Get the Popo as array
      *

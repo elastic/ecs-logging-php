@@ -41,8 +41,6 @@ class TestHelper
 
     public function run(Closure $log): array
     {
-        $this->logOriginFunction = __METHOD__;
-
         $logger = new Logger($this->loggerName);
         $handler = new MockHandler();
 

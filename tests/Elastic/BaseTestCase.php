@@ -19,7 +19,6 @@ use \Throwable;
  */
 class BaseTestCase extends TestCase
 {
-
     /**
      * @return string
      */
