@@ -26,6 +26,8 @@ jobs:
           - 7.3-alpine
           - 7.4-alpine
           - 8.0-alpine
+          - 8.1-alpine
+          - 8.2-alpine
     runs-on: ubuntu-latest
     container: php:${{ matrix.php-image }}
     steps:
