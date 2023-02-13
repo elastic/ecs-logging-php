@@ -21,7 +21,6 @@ use JsonSerializable;
  */
 class Service extends BaseType implements JsonSerializable
 {
-
     /**
      * @var array
      */
@@ -121,8 +120,12 @@ class Service extends BaseType implements JsonSerializable
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
+     *
+     * @noinspection PhpFullyQualifiedNameUsageInspection
+     * @noinspection PhpLanguageLevelInspection
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return ['service' => $this->data];

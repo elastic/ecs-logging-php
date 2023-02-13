@@ -35,6 +35,11 @@ class Error extends BaseType implements JsonSerializable
         $this->throwable = $throwable;
     }
 
+    /**
+     * @param Throwable $throwable
+     *
+     * @return array<string, mixed>
+     */
     public static function serialize(Throwable $throwable): array
     {
         return [
@@ -46,8 +51,12 @@ class Error extends BaseType implements JsonSerializable
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
+     *
+     * @noinspection PhpFullyQualifiedNameUsageInspection
+     * @noinspection PhpLanguageLevelInspection
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize(): array
     {
         return self::serialize($this->throwable);

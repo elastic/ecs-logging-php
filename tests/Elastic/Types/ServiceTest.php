@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Elastic\Tests\Types;
 
-use \Elastic\Tests\BaseTestCase;
+use Elastic\Tests\BaseTestCase;
 use Elastic\Types\Service;
 use Elastic\Types\BaseType;
 
@@ -17,21 +17,20 @@ use Elastic\Types\BaseType;
  *
  * @version v1.x
  *
- * @see Elastic\Types\Service
+ * @see \Elastic\Types\Service
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
  */
 class ServiceTest extends BaseTestCase
 {
-
     /**
-     * @covers Elastic\Types\Service::__construct
-     * @covers Elastic\Types\Service::jsonSerialize
-     * @covers Elastic\Types\Service::setId
-     * @covers Elastic\Types\Service::setName
-     * @covers Elastic\Types\Service::setState
-     * @covers Elastic\Types\Service::setType
-     * @covers Elastic\Types\Service::setVersion
+     * @covers \Elastic\Types\Service::__construct
+     * @covers \Elastic\Types\Service::jsonSerialize
+     * @covers \Elastic\Types\Service::setId
+     * @covers \Elastic\Types\Service::setName
+     * @covers \Elastic\Types\Service::setState
+     * @covers \Elastic\Types\Service::setType
+     * @covers \Elastic\Types\Service::setVersion
      */
     public function testSerializationOfCoreFields()
     {
@@ -74,9 +73,9 @@ class ServiceTest extends BaseTestCase
     /**
      * @depends testSerializationOfCoreFields
      *
-     * @covers Elastic\Types\Service::__construct
-     * @covers Elastic\Types\Service::jsonSerialize
-     * @covers Elastic\Types\Service::setEphemeralId
+     * @covers \Elastic\Types\Service::__construct
+     * @covers \Elastic\Types\Service::jsonSerialize
+     * @covers \Elastic\Types\Service::setEphemeralId
      */
     public function testSeralizeEphemeralId()
     {
@@ -95,9 +94,9 @@ class ServiceTest extends BaseTestCase
     /**
      * @depends testSerializationOfCoreFields
      *
-     * @covers Elastic\Types\Service::__construct
-     * @covers Elastic\Types\Service::jsonSerialize
-     * @covers Elastic\Types\Service::setNodeName
+     * @covers \Elastic\Types\Service::__construct
+     * @covers \Elastic\Types\Service::jsonSerialize
+     * @covers \Elastic\Types\Service::setNodeName
      */
     public function testSeralizeNodeName()
     {

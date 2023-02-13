@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Elastic\Tests\Types;
 
-use \Elastic\Tests\BaseTestCase;
+use Elastic\Tests\BaseTestCase;
 use Elastic\Types\User;
 use Elastic\Types\BaseType;
 
@@ -17,18 +17,17 @@ use Elastic\Types\BaseType;
  *
  * @version v1.x
  *
- * @see Elastic\Types\User
+ * @see \Elastic\Types\User
  *
  * @author Philip Krauss <philip.krauss@elastic.co>
  */
 class UserTest extends BaseTestCase
 {
-
     /**
-     * @covers Elastic\Types\User::__construct
-     * @covers Elastic\Types\User::jsonSerialize
-     * @covers Elastic\Types\User::setId
-     * @covers Elastic\Types\User::setName
+     * @covers \Elastic\Types\User::__construct
+     * @covers \Elastic\Types\User::jsonSerialize
+     * @covers \Elastic\Types\User::setId
+     * @covers \Elastic\Types\User::setName
      */
     public function testSerialization()
     {
@@ -59,9 +58,9 @@ class UserTest extends BaseTestCase
     /**
      * @depends testSerialization
      *
-     * @covers Elastic\Types\User::__construct
-     * @covers Elastic\Types\User::jsonSerialize
-     * @covers Elastic\Types\User::setDomain
+     * @covers \Elastic\Types\User::__construct
+     * @covers \Elastic\Types\User::jsonSerialize
+     * @covers \Elastic\Types\User::setDomain
      */
     public function testSeralizeDomain()
     {
@@ -80,9 +79,9 @@ class UserTest extends BaseTestCase
     /**
      * @depends testSerialization
      *
-     * @covers Elastic\Types\User::__construct
-     * @covers Elastic\Types\User::jsonSerialize
-     * @covers Elastic\Types\User::setEmail
+     * @covers \Elastic\Types\User::__construct
+     * @covers \Elastic\Types\User::jsonSerialize
+     * @covers \Elastic\Types\User::setEmail
      */
     public function testSeralizeEmail()
     {
@@ -101,9 +100,9 @@ class UserTest extends BaseTestCase
     /**
      * @depends testSerialization
      *
-     * @covers Elastic\Types\User::__construct
-     * @covers Elastic\Types\User::jsonSerialize
-     * @covers Elastic\Types\User::setFullName
+     * @covers \Elastic\Types\User::__construct
+     * @covers \Elastic\Types\User::jsonSerialize
+     * @covers \Elastic\Types\User::setFullName
      */
     public function testSeralizeFullName()
     {
@@ -122,9 +121,9 @@ class UserTest extends BaseTestCase
     /**
      * @depends testSerialization
      *
-     * @covers Elastic\Types\User::__construct
-     * @covers Elastic\Types\User::jsonSerialize
-     * @covers Elastic\Types\User::setHash
+     * @covers \Elastic\Types\User::__construct
+     * @covers \Elastic\Types\User::jsonSerialize
+     * @covers \Elastic\Types\User::setHash
      */
     public function testSeralizeHash()
     {

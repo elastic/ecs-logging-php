@@ -202,7 +202,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @return array<array<mixed>>
      */
-    public function dataProviderForTestContextWithError(): iterable
+    public static function dataProviderForTestContextWithError(): iterable
     {
         return [
             [self::generateException(), false],
@@ -409,7 +409,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
     /**
      * @return array<array<bool>>
      */
-    public function dataProviderForTestsIntrospectionProcessor(): iterable
+    public static function dataProviderForTestsIntrospectionProcessor(): iterable
     {
         return [[false], [true]];
     }
