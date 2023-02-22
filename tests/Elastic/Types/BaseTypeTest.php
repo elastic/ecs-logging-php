@@ -35,6 +35,7 @@ class BaseTypeTest extends BaseTestCase
         $arr2 = $tracing->jsonSerialize();
 
         $this->assertEquals($arr1, $arr2);
+        $this->fail('Dummy failure to test CI');
     }
 
     /**
