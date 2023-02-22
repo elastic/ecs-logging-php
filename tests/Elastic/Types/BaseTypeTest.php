@@ -23,7 +23,6 @@ use Elastic\Types\BaseType;
  */
 class BaseTypeTest extends BaseTestCase
 {
-
     /**
      * @covers \Elastic\Types\BaseType::toArray
      */
