@@ -5,7 +5,9 @@ on:
   workflow_run:
     workflows:
       - test
+      - test-reporter
       - update-specs
+      - release
     types: [completed]
 
 jobs:
