@@ -1,4 +1,4 @@
-# Monolog v2.x
+# Monolog v3.x
 
 ## Initialize the Formatter
 ```php

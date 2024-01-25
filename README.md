@@ -16,10 +16,10 @@ composer require elastic/ecs-logging
 ```
 
 ## Examples and Usage
-* [Monolog v2.0](https://github.com/elastic/ecs-logging-php/blob/main/docs/Monolog_v2.md)
+* [Monolog v3.0](https://github.com/elastic/ecs-logging-php/blob/main/docs/Monolog_v3.md)
 
 ## Library Support
-* Currently only [Monolog:2.*](https://github.com/Seldaek/monolog) is supported.
+* Currently only [Monolog:3.*](https://github.com/Seldaek/monolog) is supported.
 * The major version of this library is compatible with the major version of ECS.
 
 ## References

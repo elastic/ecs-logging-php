@@ -22,10 +22,6 @@ jobs:
       fail-fast: false
       matrix:
         php-image:
-          - 7.2-alpine
-          - 7.3-alpine
-          - 7.4-alpine
-          - 8.0-alpine
           - 8.1-alpine
           - 8.2-alpine
     runs-on: ubuntu-latest

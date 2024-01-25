@@ -10,12 +10,13 @@ namespace Elastic\Monolog\Formatter;
 
 use Elastic\Types\Error as EcsError;
 use Monolog\Formatter\NormalizerFormatter;
+use Monolog\LogRecord;
 use Throwable;
 
 /**
  * Serializes a log message to the Elastic Common Schema (ECS)
  *
- * @version Monolog v2.x
+ * @version Monolog v3.x
  * @version ECS v1.x
  *
  * @see     https://www.elastic.co/guide/en/ecs/1.4/ecs-log.html
@@ -55,7 +56,7 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
     }
 
     /** @inheritDoc */
-    protected function normalize($data, int $depth = 0)
+    protected function normalize(mixed $data, int $depth = 0): mixed
     {
         if ($depth > $this->maxNormalizeDepth) {
             return parent::normalize($data, $depth);
@@ -79,9 +80,9 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
      * @link https://www.elastic.co/guide/en/ecs/1.1/ecs-base.html
      * @link https://www.elastic.co/guide/en/ecs/current/ecs-tracing.html
      */
-    public function format(array $record): string
+    public function format(LogRecord $record): string
     {
-        $inRecord = $this->normalize($record);
+        $inRecord = $this->normalize($record->toArray());
 
         // Build Skeleton with "@timestamp" and "log.level"
         $outRecord = [
