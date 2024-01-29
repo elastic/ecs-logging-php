@@ -14,7 +14,12 @@
         {
             "name": "Sergey Kleyman",
             "homepage": "https://github.com/SergeyKleyman"
+        },
+        {
+            "name": "Pawel Filipczak",
+            "homepage": "https://github.com/intuibase"
         }
+
     ],
     "require": {
         "php": ">=8.1",
