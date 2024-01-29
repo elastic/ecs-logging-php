@@ -20,7 +20,6 @@ composer require elastic/ecs-logging
 
 ## Library Support
 * Currently only [Monolog:3.*](https://github.com/Seldaek/monolog) is supported.
-* The major version of this library is compatible with the major version of ECS.
 
 ## References
 * [Documentation](https://www.elastic.co/guide/en/ecs-logging/php/current/intro.html)
