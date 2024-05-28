@@ -6,7 +6,6 @@ scms:
     kind: github
     spec:
       user: '{{ requiredEnv "GITHUB_ACTOR" }}'
-      email: '{{ requiredEnv "GIT_EMAIL" }}'
       owner: elastic
       repository: ecs-logging-php
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
