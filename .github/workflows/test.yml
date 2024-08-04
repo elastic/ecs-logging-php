@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     container: php:${{ matrix.php-image }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Append PATH
         run: echo "${GITHUB_WORKSPACE}" >> $GITHUB_PATH
       - name: Install composer
@@ -38,7 +38,7 @@ jobs:
         env:
           VERSION: ${{ matrix.php-image }}
         run: composer test
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: junit-*.xml
