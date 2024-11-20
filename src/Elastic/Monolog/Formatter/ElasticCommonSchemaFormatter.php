@@ -73,14 +73,7 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         return parent::normalize($data, $depth);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @link https://www.elastic.co/guide/en/ecs/1.1/ecs-log.html
-     * @link https://www.elastic.co/guide/en/ecs/1.1/ecs-base.html
-     * @link https://www.elastic.co/guide/en/ecs/current/ecs-tracing.html
-     */
-    public function format(LogRecord $record): string
+    public function formatAsArray(LogRecord $record): array
     {
         $inRecord = $this->normalize($record->toArray());
 
@@ -129,7 +122,19 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
             $outRecord['tags'] = $this->normalize($this->tags);
         }
 
-        return $this->toJson($outRecord) . "\n";
+        return $outRecord;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @link https://www.elastic.co/guide/en/ecs/1.1/ecs-log.html
+     * @link https://www.elastic.co/guide/en/ecs/1.1/ecs-base.html
+     * @link https://www.elastic.co/guide/en/ecs/current/ecs-tracing.html
+     */
+    public function format(LogRecord $record)
+    {
+        return $this->toJson($this->formatAsArray($record)) . "\n";
     }
 
     private function formatContext(array $inContext, array &$outRecord): void
