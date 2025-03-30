@@ -161,6 +161,7 @@ class ElasticCommonSchemaFormatterTest extends BaseTestCase
 
         $this->assertEquals($service->toArray()['service']['id'], $decoded['service']['id']);
         $this->assertEquals($service->toArray()['service']['name'], $decoded['service']['name']);
+        $this->assertEquals($service->toArray()['event']['dataset'], $decoded['service']['name'] . '.log');
     }
 
     /**
