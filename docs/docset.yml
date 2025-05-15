@@ -1,4 +1,6 @@
 project: 'ECS Logging PHP'
+products:
+  - id: ecs-logging
 exclude:
   - Monolog_v3.md
 cross_links:
