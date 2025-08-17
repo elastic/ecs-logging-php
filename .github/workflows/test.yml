@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     container: php:${{ matrix.php-image }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Append PATH
         run: echo "${GITHUB_WORKSPACE}" >> $GITHUB_PATH
       - name: Install composer
