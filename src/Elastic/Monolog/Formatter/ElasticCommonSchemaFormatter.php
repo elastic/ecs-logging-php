@@ -26,7 +26,8 @@ use Throwable;
  */
 class ElasticCommonSchemaFormatter extends NormalizerFormatter
 {
-    private const ECS_VERSION = '1.2.0';
+    /** @var string */
+    private $ecsVersion;
 
     private static $logOriginKeys = ['file' => true, 'line' => true, 'class' => true, 'function' => true];
 
@@ -43,10 +44,11 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
     /**
      * @param array $tags optional tags to enrich the log lines
      */
-    public function __construct(array $tags = [])
+    public function __construct(array $tags = [], $ecsVersion = '1.2.0')
     {
         parent::__construct('Y-m-d\TH:i:s.uP');
         $this->tags = $tags;
+        $this->ecsVersion = $ecsVersion;
     }
 
     public function useLogOriginFromContext(bool $useLogOriginFromContext): self
@@ -96,7 +98,7 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
         }
 
         // Add "ecs.version"
-        $outRecord['ecs.version'] = self::ECS_VERSION;
+        $outRecord['ecs.version'] = $this->ecsVersion;
 
         // Add "log": { "logger": ..., ... }
         $outRecord['log'] = [
