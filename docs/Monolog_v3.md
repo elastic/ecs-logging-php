@@ -1,3 +1,9 @@
+---
+applies_to:
+  stack: ga
+  serverless: ga
+---
+
 # Monolog v3.x
 
 ## Initialize the Formatter
