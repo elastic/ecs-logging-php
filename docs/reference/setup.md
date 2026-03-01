@@ -1,4 +1,7 @@
 ---
+applies_to:
+  stack: ga
+  serverless: ga
 mapped_pages:
   - https://www.elastic.co/guide/en/ecs-logging/php/current/setup.html
 navigation_title: Get started
@@ -75,6 +78,11 @@ Logs the following (multi-line formatted for better readability):
 
 
 ## Step 2: Configure Filebeat [setup-step-2]
+
+```{applies_to}
+stack: ga
+serverless: unavailable
+```
 
 :::::::{tab-set}
 
