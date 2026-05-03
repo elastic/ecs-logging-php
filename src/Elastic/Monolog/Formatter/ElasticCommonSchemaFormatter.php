@@ -70,6 +70,10 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
             return $data->jsonSerialize();
         }
 
+        if ($data instanceof EcsTracing) {
+            return $data->jsonSerialize();
+        }
+
         return parent::normalize($data, $depth);
     }
 
@@ -105,7 +109,8 @@ class ElasticCommonSchemaFormatter extends NormalizerFormatter
 
         // Add Tracing Context
         if (isset($inRecord['context']['tracing']['Elastic\Types\Tracing']) === true) {
-            $outRecord += $inRecord['context']['tracing']['Elastic\Types\Tracing'];
+            $outRecord['trace.id'] = $inRecord['context']['tracing']['Elastic\Types\Tracing']['trace.id'];
+            $outRecord['span.id'] = $inRecord['context']['tracing']['Elastic\Types\Tracing']['span.id'];
             unset($inRecord['context']['tracing']);
         }
 
