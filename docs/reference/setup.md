@@ -9,11 +9,6 @@ navigation_title: Get started
 
 # Get started with ECS Logging PHP [setup]
 
-::::{note}
-ECS logging for PHP is currently only available for Monolog v2.*.
-::::
-
-
 
 ## Step 1: Set up application logging [setup-step-1]
 
@@ -27,7 +22,7 @@ composer require elastic/ecs-logging
 
 ### Configure monolog logger [_configure_monolog_logger]
 
-`Elastic\Monolog\v2\Formatter\ElasticCommonSchemaFormatter` implements Monolog’s [`FormatterInterface`](https://github.com/Seldaek/monolog/blob/2.0.0/src/Monolog/Formatter/FormatterInterface.php) and thus it can be used when setting up Monolog logger.
+`Elastic\Monolog\Formatter\ElasticCommonSchemaFormatter` implements Monolog’s [`FormatterInterface`](https://github.com/Seldaek/monolog/blob/main/src/Monolog/Formatter/FormatterInterface.php) and thus it can be used when setting up Monolog logger.
 
 For example:
 
